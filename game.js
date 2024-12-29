@@ -125,17 +125,6 @@ function initializeDice() {
     updatePatternsList();
 }
 
-function createSnowflakes() {
-    const snowflake = document.createElement('div');
-    snowflake.className = 'snowflake';
-    snowflake.textContent = '❄';
-    snowflake.style.left = Math.random() * 100 + 'vw';
-    snowflake.style.animationDuration = Math.random() * 3 + 2 + 's';
-    document.body.appendChild(snowflake);
-
-    snowflake.addEventListener('animationend', () => snowflake.remove());
-}
-
 // Start the game when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     initializeDice();
