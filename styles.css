@@ -26,6 +26,7 @@ h1 {
     margin-bottom: 30px;
 }
 /* styles.css - Part 2: Dice Container and Basic Die Styling */
+/* styles.css - Part 2: Dice Container and Basic Die Styling */
 .dice-container {
     display: flex;
     justify-content: center;
@@ -34,7 +35,7 @@ h1 {
 }
 
 .die {
-    width: 120px;
+    width: 120px;  /* Keep width and height equal */
     height: 120px;
     background: #ffffff;
     border-radius: 10px;
@@ -46,12 +47,16 @@ h1 {
     box-sizing: border-box;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     border: 2px solid #ff0000;
-    transition: transform 0.3s ease;
+    position: relative; /* Added for absolute positioning of circle */
 }
 
 .die-circle {
-    width: 70px;
-    height: 70px;
+    position: absolute; /* Position circle absolutely */
+    top: 50%;         /* Center vertically */
+    left: 50%;        /* Center horizontally */
+    transform: translate(-50%, -50%); /* Perfect centering */
+    width: 60px;      /* Fixed size for circle */
+    height: 60px;     /* Same as width to ensure perfect circle */
     border-radius: 50%;
     border: 2px solid #ff0000;
     display: flex;
@@ -61,10 +66,15 @@ h1 {
 }
 
 .die-text {
-    margin-top: 10px;
+    position: absolute;
+    bottom: 10px;    /* Position text at bottom */
+    left: 0;         /* Stretch across die */
+    right: 0;
+    text-align: center;
     font-weight: bold;
     color: #0a5f38;
 }
+
 /* styles.css - Part 3: Color Die Styles */
 .die[data-color="Red"] .color-circle {
     background-color: #ff0000;
