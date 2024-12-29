@@ -14,7 +14,7 @@ const diceConfig = {
     },
     dice3: {
         name: 'Decoration',
-        faces: ['Snowman', 'Reindeer', 'Tree', 'Star', 'Bell'],
+        faces: ['Snowman', 'Reindeer', 'Tree', 'Snowflake'],
         default: 'Tree',
         currentValue: null
     }
