@@ -2,7 +2,7 @@
 const diceConfig = {
     dice1: {
         name: 'Color',
-        faces: ['Red', 'Green', 'Gold'],
+        faces: ['Red', 'Green', 'Yellow'],
         default: 'Red',
         currentValue: null
     },
