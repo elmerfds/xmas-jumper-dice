@@ -5,26 +5,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Xmas Jumper Game Dice</title>
     <link rel="stylesheet" href="styles.css">
-    <style>
-        /* Optional: Additional styles */
-    </style>
 </head>
 <body>
     <div class="container">
         <h1>🎄 Xmas Jumper Game Dice 🎄</h1>
         
-        <div class="dice-container">
-            <div class="die" id="die1">
-                <div class="die-circle color-circle"></div>
-                <span class="die-text"></span>
-            </div>
-            <div class="die" id="die2">
-                <div class="die-circle pattern-circle"></div>
-                <span class="die-text"></span>
-            </div>
-            <div class="die" id="die3">
-                <div class="die-circle decoration-circle"></div>
-                <span class="die-text"></span>
+        <div class="dice-section">
+            <div class="dice-container">
+                <div class="die-wrapper">
+                    <div class="die" id="die1">
+                        <div class="die-circle color-circle"></div>
+                    </div>
+                    <span class="die-text"></span>
+                </div>
+                <div class="die-wrapper">
+                    <div class="die" id="die2">
+                        <div class="die-circle pattern-circle"></div>
+                    </div>
+                    <span class="die-text"></span>
+                </div>
+                <div class="die-wrapper">
+                    <div class="die" id="die3">
+                        <div class="die-circle decoration-circle"></div>
+                    </div>
+                    <span class="die-text"></span>
+                </div>
             </div>
         </div>
 
@@ -40,21 +45,20 @@
         </div>
 
         <footer>
-            <p>Made with ❤️ for Christmas 2024</p>
             <div class="rules">
                 <p>How to Play:</p>
                 <ol>
                     <li>Click "Roll Dice" to roll all three dice</li>
-                    <li>Each die represents: Color, Pattern, and Decoration</li>
+                    <li>First die shows the Color</li>
+                    <li>Second die shows the Pattern</li>
+                    <li>Third die shows the Decoration</li>
                     <li>Match the combination with your physical Xmas jumper card</li>
                     <li>Found patterns will be checked off in the list below</li>
                 </ol>
             </div>
+            <p>Made with ❤️ for Christmas 2024</p>
         </footer>
     </div>
-
-    <!-- Snowflakes container -->
-    <div class="snowflakes" aria-hidden="true"></div>
 
     <!-- Scripts -->
     <script src="config.js"></script>
