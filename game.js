@@ -41,8 +41,7 @@ function updatePatternsList() {
 
 function updateDieDisplay(dieId, value, type) {
     const die = document.getElementById(dieId);
-    const textSpan = die.querySelector('.die-text') || die.appendChild(document.createElement('span'));
-    textSpan.className = 'die-text';
+    const textSpan = die.querySelector('.die-text');
     textSpan.textContent = value;
     
     // Remove all previous data attributes
@@ -52,6 +51,13 @@ function updateDieDisplay(dieId, value, type) {
     
     // Add new data attribute based on type
     die.setAttribute(`data-${type}`, value);
+
+    // Ensure pattern overlay exists for pattern die
+    if (type === 'pattern' && !die.querySelector('.pattern-overlay')) {
+        const overlay = document.createElement('div');
+        overlay.className = 'pattern-overlay';
+        die.appendChild(overlay);
+    }
 }
 
 function rollDice() {
