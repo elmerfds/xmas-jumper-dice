@@ -41,7 +41,8 @@ function updatePatternsList() {
 
 function updateDieDisplay(dieId, value, type) {
     const die = document.getElementById(dieId);
-    const textSpan = die.querySelector('.die-text');
+    const dieWrapper = die.closest('.die-wrapper');
+    const textSpan = dieWrapper.querySelector('.die-text');
     textSpan.textContent = value;
     
     // Remove all previous data attributes
@@ -51,13 +52,6 @@ function updateDieDisplay(dieId, value, type) {
     
     // Add new data attribute based on type
     die.setAttribute(`data-${type}`, value);
-
-    // Ensure pattern overlay exists for pattern die
-    if (type === 'pattern' && !die.querySelector('.pattern-overlay')) {
-        const overlay = document.createElement('div');
-        overlay.className = 'pattern-overlay';
-        die.appendChild(overlay);
-    }
 }
 
 function rollDice() {
@@ -68,35 +62,54 @@ function rollDice() {
     rollButton.disabled = true;
 
     const dice = document.querySelectorAll('.die');
-    dice.forEach(die => die.classList.add('rolling'));
+    dice.forEach(die => {
+        die.classList.add('rolling');
+        // Hide current content during roll
+        die.querySelector('.die-circle').style.opacity = '0.5';
+    });
 
+    // Generate new values
     const color = diceConfig.dice1.faces[Math.floor(Math.random() * diceConfig.dice1.faces.length)];
     const pattern = diceConfig.dice2.faces[Math.floor(Math.random() * diceConfig.dice2.faces.length)];
     const decoration = diceConfig.dice3.faces[Math.floor(Math.random() * diceConfig.dice3.faces.length)];
 
-    setTimeout(() => {
-        // Update dice displays with visual representations
-        updateDieDisplay('die1', color, 'color');
-        updateDieDisplay('die2', pattern, 'pattern');
-        updateDieDisplay('die3', decoration, 'decoration');
+    // Multiple rotation animation
+    let rotations = 2;
+    let currentRotation = 0;
+    
+    function rotate() {
+        if (currentRotation < rotations) {
+            currentRotation++;
+            setTimeout(rotate, 800); // Match this with CSS animation duration
+        } else {
+            // Final update after rotations complete
+            dice.forEach(die => {
+                die.classList.remove('rolling');
+                die.querySelector('.die-circle').style.opacity = '1';
+            });
+            
+            updateDieDisplay('die1', color, 'color');
+            updateDieDisplay('die2', pattern, 'pattern');
+            updateDieDisplay('die3', decoration, 'decoration');
 
-        dice.forEach(die => die.classList.remove('rolling'));
+            diceConfig.dice1.currentValue = color;
+            diceConfig.dice2.currentValue = pattern;
+            diceConfig.dice3.currentValue = decoration;
 
-        diceConfig.dice1.currentValue = color;
-        diceConfig.dice2.currentValue = pattern;
-        diceConfig.dice3.currentValue = decoration;
+            const combination = `${color} ${pattern} ${decoration}`;
+            foundPatterns.add(combination);
+            updatePatternsList();
 
-        const combination = `${color} ${pattern} ${decoration}`;
-        foundPatterns.add(combination);
-        updatePatternsList();
+            rollButton.disabled = false;
+            isRolling = false;
+        }
+    }
 
-        rollButton.disabled = false;
-        isRolling = false;
-    }, 500);
+    rotate(); // Start the rotation sequence
 }
 
 function initializeDice() {
-    // Set initial values with visual representations
+    // Set initial values
     updateDieDisplay('die1', diceConfig.dice1.default, 'color');
     updateDieDisplay('die2', diceConfig.dice2.default, 'pattern');
     updateDieDisplay('die3', diceConfig.dice3.default, 'decoration');
@@ -105,9 +118,11 @@ function initializeDice() {
     diceConfig.dice2.currentValue = diceConfig.dice2.default;
     diceConfig.dice3.currentValue = diceConfig.dice3.default;
 
+    // Add click event listener to roll button
     const rollButton = document.getElementById('rollButton');
     rollButton.addEventListener('click', rollDice);
 
+    // Initialize patterns list and stats
     updatePatternsList();
 }
 
