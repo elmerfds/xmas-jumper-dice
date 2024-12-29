@@ -85,68 +85,79 @@ h1 {
 }
 
 /* Pattern styles */
-.die[data-pattern="Striped"]::before {
-    content: '';
+.die {
+    position: relative;
+    overflow: hidden;
+}
+
+.pattern-overlay {
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
+    z-index: 1;
+}
+
+.die[data-pattern="Striped"] .pattern-overlay {
     background: repeating-linear-gradient(
         45deg,
-        rgba(255, 255, 255, 0.2),
-        rgba(255, 255, 255, 0.2) 10px,
+        rgba(0, 0, 0, 0.2),
+        rgba(0, 0, 0, 0.2) 10px,
         transparent 10px,
         transparent 20px
     );
 }
 
-.die[data-pattern="Spotty"]::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+.die[data-pattern="Spotty"] .pattern-overlay {
     background: radial-gradient(
         circle,
-        rgba(255, 255, 255, 0.2) 2px,
-        transparent 2px
-    ) 0 0/15px 15px;
+        rgba(0, 0, 0, 0.2) 3px,
+        transparent 3px
+    ) 0 0/20px 20px;
 }
 
-.die[data-pattern="Zigzag"]::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+.die[data-pattern="Zigzag"] .pattern-overlay {
     background: linear-gradient(
         135deg,
-        rgba(255, 255, 255, 0.2) 25%,
+        rgba(0, 0, 0, 0.2) 25%,
         transparent 25%
     ) -10px 0/ 20px 20px,
     linear-gradient(
         225deg,
-        rgba(255, 255, 255, 0.2) 25%,
+        rgba(0, 0, 0, 0.2) 25%,
         transparent 25%
     ) -10px 0/ 20px 20px;
 }
 
-.die[data-pattern="Checkered"]::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: repeating-conic-gradient(
-        rgba(255, 255, 255, 0.2) 0% 25%,
-        transparent 0% 50%
-    ) 50% / 20px 20px;
+.die[data-pattern="Plain"] .pattern-overlay {
+    background: rgba(0, 0, 0, 0.05);
 }
 
+.die[data-pattern="Checkered"] .pattern-overlay {
+    background: 
+        linear-gradient(45deg, 
+            rgba(0, 0, 0, 0.2) 25%, 
+            transparent 25%, 
+            transparent 75%, 
+            rgba(0, 0, 0, 0.2) 75%
+        ),
+        linear-gradient(45deg, 
+            rgba(0, 0, 0, 0.2) 25%, 
+            transparent 25%, 
+            transparent 75%, 
+            rgba(0, 0, 0, 0.2) 75%
+        );
+    background-size: 20px 20px;
+    background-position: 0 0, 10px 10px;
+}
+
+.die-text {
+    position: relative;
+    z-index: 2;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+}
 
 /* Decoration styles */
 .die[data-decoration="Snowman"]::after {
