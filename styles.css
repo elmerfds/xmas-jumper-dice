@@ -100,7 +100,7 @@ h1 {
         transparent 20px
     );
 }
-/* styles.css - Part 3 */
+
 .die[data-pattern="Spotty"]::before {
     content: '';
     position: absolute;
@@ -146,6 +146,7 @@ h1 {
         transparent 0% 50%
     ) 50% / 20px 20px;
 }
+
 
 /* Decoration styles */
 .die[data-decoration="Snowman"]::after {
