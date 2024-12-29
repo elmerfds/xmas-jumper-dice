@@ -1,4 +1,4 @@
-/* styles.css - Part 1 */
+/* styles.css - Part 1: Basic Setup and Layout */
 body {
     background-color: #0a5f38;
     color: #ffffff;
@@ -25,7 +25,7 @@ h1 {
     font-size: 2.5em;
     margin-bottom: 30px;
 }
-
+/* styles.css - Part 2: Dice Container and Basic Die Styling */
 .dice-container {
     display: flex;
     justify-content: center;
@@ -34,107 +34,98 @@ h1 {
 }
 
 .die {
-    width: 100px;
-    height: 100px;
+    width: 120px;
+    height: 120px;
     background: #ffffff;
     border-radius: 10px;
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: center;
-    font-size: 1.2em;
-    color: #0a5f38;
+    justify-content: space-between;
+    padding: 15px;
+    box-sizing: border-box;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     border: 2px solid #ff0000;
-    padding: 10px;
-    text-align: center;
     transition: transform 0.3s ease;
-    position: relative;
-    overflow: hidden;
 }
-/* styles.css - Part 2 */
+
+.die-circle {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    border: 2px solid #ff0000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #ffffff;
+}
+
 .die-text {
-    position: relative;
-    z-index: 2;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+    margin-top: 10px;
+    font-weight: bold;
+    color: #0a5f38;
 }
-
-/* Color styles */
-.die[data-color="Red"] {
+/* styles.css - Part 3: Color Die Styles */
+.die[data-color="Red"] .color-circle {
     background-color: #ff0000;
-    color: white;
 }
 
-.die[data-color="Green"] {
+.die[data-color="Green"] .color-circle {
     background-color: #00aa00;
-    color: white;
 }
 
-.die[data-color="White"] {
+.die[data-color="White"] .color-circle {
     background-color: #ffffff;
-    color: #0a5f38;
 }
 
-.die[data-color="Blue"] {
+.die[data-color="Blue"] .color-circle {
     background-color: #0000ff;
-    color: white;
 }
 
-.die[data-color="Gold"] {
+.die[data-color="Gold"] .color-circle {
     background-color: #ffd700;
-    color: #0a5f38;
 }
-
-/* Pattern styles */
-.die {
-    position: relative;
+/* styles.css - Part 4: Pattern Die Styles */
+.pattern-circle {
     overflow: hidden;
 }
 
-.pattern-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 1;
-}
-
-.die[data-pattern="Striped"] .pattern-overlay {
+.die[data-pattern="Striped"] .pattern-circle {
     background: repeating-linear-gradient(
         45deg,
         rgba(0, 0, 0, 0.2),
-        rgba(0, 0, 0, 0.2) 10px,
-        transparent 10px,
-        transparent 20px
+        rgba(0, 0, 0, 0.2) 6px,
+        transparent 6px,
+        transparent 12px
     );
 }
 
-.die[data-pattern="Spotty"] .pattern-overlay {
+.die[data-pattern="Spotty"] .pattern-circle {
     background: radial-gradient(
         circle,
-        rgba(0, 0, 0, 0.2) 3px,
-        transparent 3px
-    ) 0 0/20px 20px;
+        rgba(0, 0, 0, 0.2) 2px,
+        transparent 2px
+    ) 0 0/15px 15px;
 }
 
-.die[data-pattern="Zigzag"] .pattern-overlay {
+.die[data-pattern="Zigzag"] .pattern-circle {
     background: linear-gradient(
         135deg,
         rgba(0, 0, 0, 0.2) 25%,
         transparent 25%
-    ) -10px 0/ 20px 20px,
+    ) -6px 0/ 12px 12px,
     linear-gradient(
         225deg,
         rgba(0, 0, 0, 0.2) 25%,
         transparent 25%
-    ) -10px 0/ 20px 20px;
+    ) -6px 0/ 12px 12px;
 }
 
-.die[data-pattern="Plain"] .pattern-overlay {
+.die[data-pattern="Plain"] .pattern-circle {
     background: rgba(0, 0, 0, 0.05);
 }
 
-.die[data-pattern="Checkered"] .pattern-overlay {
+.die[data-pattern="Checkered"] .pattern-circle {
     background: 
         linear-gradient(45deg, 
             rgba(0, 0, 0, 0.2) 25%, 
@@ -148,44 +139,34 @@ h1 {
             transparent 75%, 
             rgba(0, 0, 0, 0.2) 75%
         );
-    background-size: 20px 20px;
-    background-position: 0 0, 10px 10px;
+    background-size: 12px 12px;
+    background-position: 0 0, 6px 6px;
+}
+/* styles.css - Part 5: Decoration Die Styles */
+.decoration-circle {
+    font-size: 2em;
 }
 
-.die-text {
-    position: relative;
-    z-index: 2;
-    font-weight: bold;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
-}
-
-/* Decoration styles */
-.die[data-decoration="Snowman"]::after {
+.die[data-decoration="Snowman"] .decoration-circle::after {
     content: '⛄';
 }
 
-.die[data-decoration="Reindeer"]::after {
+.die[data-decoration="Reindeer"] .decoration-circle::after {
     content: '🦌';
 }
 
-.die[data-decoration="Tree"]::after {
+.die[data-decoration="Tree"] .decoration-circle::after {
     content: '🎄';
 }
 
-.die[data-decoration="Star"]::after {
+.die[data-decoration="Star"] .decoration-circle::after {
     content: '⭐';
 }
 
-.die[data-decoration="Bell"]::after {
+.die[data-decoration="Bell"] .decoration-circle::after {
     content: '🔔';
 }
-
-.die::after {
-    position: absolute;
-    font-size: 2em;
-    z-index: 1;
-}
-/* styles.css - Part 4 */
+/* styles.css - Part 6: Button and List Styles */
 #rollButton {
     background-color: #ff0000;
     color: white;
@@ -238,13 +219,36 @@ h1 {
     width: 18px;
     height: 18px;
 }
-
+/* styles.css - Part 7: Stats, Footer, and Animations */
 .stats {
     margin: 20px 0;
     font-size: 1.2em;
-    color: #ffffff;
 }
 
+footer {
+    margin-top: 40px;
+    padding: 20px;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.rules {
+    margin-top: 20px;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    text-align: left;
+}
+
+.rules ol {
+    margin: 10px 0;
+    padding-left: 25px;
+}
+
+.rules li {
+    margin: 5px 0;
+}
+
+/* Snowflake Animation */
 .snowflake {
     position: fixed;
     color: white;
@@ -261,27 +265,46 @@ h1 {
     }
 }
 
-@keyframes shake {
-    0%, 100% { transform: rotate(0deg); }
-    25% { transform: rotate(-5deg); }
-    75% { transform: rotate(5deg); }
+/* Dice Rolling Animation */
+.die.rolling .die-circle {
+    animation: rotate 0.5s ease-in-out;
 }
 
-.die.rolling {
-    animation: shake 0.5s ease-in-out;
+@keyframes rotate {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
 
-footer {
-    margin-top: 40px;
-    padding: 20px;
-    color: rgba(255, 255, 255, 0.8);
+/* Scrollbar Styling */
+.patterns-list::-webkit-scrollbar {
+    width: 8px;
 }
 
+.patterns-list::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+}
+
+.patterns-list::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+}
+
+.patterns-list::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.4);
+}
+
+/* Mobile Responsiveness */
 @media (max-width: 600px) {
     .die {
-        width: 80px;
-        height: 80px;
-        font-size: 1em;
+        width: 90px;
+        height: 90px;
+        padding: 10px;
+    }
+
+    .die-circle {
+        width: 50px;
+        height: 50px;
     }
 
     h1 {
@@ -302,64 +325,12 @@ footer {
         font-size: 1.1em;
     }
 
-    .die::after {
+    .decoration-circle {
         font-size: 1.5em;
     }
-}
 
-/* Scrollbar styling */
-.patterns-list::-webkit-scrollbar {
-    width: 8px;
+    .die-text {
+        font-size: 0.9em;
+    }
 }
-
-.patterns-list::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 4px;
-}
-
-.patterns-list::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.3);
-    border-radius: 4px;
-}
-
-.patterns-list::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.4);
-}
-
-.rules {
-    margin-top: 20px;
-    padding: 15px;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 10px;
-    text-align: left;
-}
-
-.rules ol {
-    margin: 10px 0;
-    padding-left: 25px;
-}
-
-.rules li {
-    margin: 5px 0;
-}
-
-.color-overlay,
-.pattern-overlay,
-.decoration-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 1;
-}
-
-/* Make sure overlays don't interfere with text */
-.die-text {
-    position: relative;
-    z-index: 3;
-    font-weight: bold;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
-}
-
 
