@@ -358,6 +358,28 @@ footer {
     }
 }
 
+/* Add these styles for the labels */
+.die {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px 10px;
+}
+
+.die-circle {
+    flex: 1;
+    margin: 5px 0;
+}
+
+.die-label {
+    font-size: 0.9em;
+    font-weight: bold;
+    color: #0a5f38;
+    text-align: center;
+    width: 100%;
+}
+
 
 
 
