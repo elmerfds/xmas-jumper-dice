@@ -97,7 +97,7 @@ h1 {
     background-color: #0000ff;
 }
 
-.die[data-color="Gold"] .die-circle {
+.die[data-color="Yellow"] .die-circle {
     background-color: #ffd700;
 }
 /* styles.css - Part 4: Pattern Die Styles */
