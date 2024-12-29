@@ -41,9 +41,8 @@ function updatePatternsList() {
 
 function updateDieDisplay(dieId, value, type) {
     const die = document.getElementById(dieId);
-    const dieWrapper = die.closest('.die-wrapper');
-    const textSpan = dieWrapper.querySelector('.die-text');
-    textSpan.textContent = value;
+    const label = die.querySelector('.die-label');
+    label.textContent = value;
     
     // Remove all previous data attributes
     die.removeAttribute('data-color');
