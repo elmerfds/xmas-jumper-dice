@@ -63,14 +63,33 @@ function rollDice() {
     const dice = document.querySelectorAll('.die');
     dice.forEach(die => {
         die.classList.add('rolling');
-        // Hide current content during roll
         die.querySelector('.die-circle').style.opacity = '0.5';
     });
 
-    // Generate new values
-    const color = diceConfig.dice1.faces[Math.floor(Math.random() * diceConfig.dice1.faces.length)];
-    const pattern = diceConfig.dice2.faces[Math.floor(Math.random() * diceConfig.dice2.faces.length)];
-    const decoration = diceConfig.dice3.faces[Math.floor(Math.random() * diceConfig.dice3.faces.length)];
+    // Get all possible combinations that haven't been found yet
+    const allPossibleCombinations = [];
+    diceConfig.dice1.faces.forEach(color => {
+        diceConfig.dice2.faces.forEach(pattern => {
+            diceConfig.dice3.faces.forEach(decoration => {
+                const combination = `${color} ${pattern} ${decoration}`;
+                if (!foundPatterns.has(combination)) {
+                    allPossibleCombinations.push({color, pattern, decoration});
+                }
+            });
+        });
+    });
+
+    // Check if all patterns have been found
+    if (allPossibleCombinations.length === 0) {
+        alert("Congratulations! You've found all possible patterns!");
+        rollButton.disabled = true;
+        isRolling = false;
+        return;
+    }
+
+    // Randomly select from remaining combinations
+    const randomIndex = Math.floor(Math.random() * allPossibleCombinations.length);
+    const selectedCombination = allPossibleCombinations[randomIndex];
 
     // Multiple rotation animation
     let rotations = 2;
@@ -87,15 +106,15 @@ function rollDice() {
                 die.querySelector('.die-circle').style.opacity = '1';
             });
             
-            updateDieDisplay('die1', color, 'color');
-            updateDieDisplay('die2', pattern, 'pattern');
-            updateDieDisplay('die3', decoration, 'decoration');
+            updateDieDisplay('die1', selectedCombination.color, 'color');
+            updateDieDisplay('die2', selectedCombination.pattern, 'pattern');
+            updateDieDisplay('die3', selectedCombination.decoration, 'decoration');
 
-            diceConfig.dice1.currentValue = color;
-            diceConfig.dice2.currentValue = pattern;
-            diceConfig.dice3.currentValue = decoration;
+            diceConfig.dice1.currentValue = selectedCombination.color;
+            diceConfig.dice2.currentValue = selectedCombination.pattern;
+            diceConfig.dice3.currentValue = selectedCombination.decoration;
 
-            const combination = `${color} ${pattern} ${decoration}`;
+            const combination = `${selectedCombination.color} ${selectedCombination.pattern} ${selectedCombination.decoration}`;
             foundPatterns.add(combination);
             updatePatternsList();
 
