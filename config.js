@@ -19,16 +19,3 @@ const diceConfig = {
         currentValue: null
     }
 };
-
-const defaultConfigs = {
-    preset1: {
-        dice1: 'Red',
-        dice2: 'Plain',
-        dice3: 'Tree'
-    },
-    preset2: {
-        dice1: 'Green',
-        dice2: 'Spotty',
-        dice3: 'Snowman'
-    }
-};
