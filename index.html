@@ -6,19 +6,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Christmas Sweater Dice Game</title>
     <link rel="stylesheet" href="styles.css">
-    <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64,">
 </head>
 <body>
     <div class="container">
         <h1>🎄 Christmas Sweater Dice Game 🎄</h1>
         
-        <div class="preset-controls"></div>
-
         <div class="dice-container">
-            <div class="die" id="die1">Color</div>
-            <div class="die" id="die2">Pattern</div>
-            <div class="die" id="die3">Decor</div>
+            <div class="die" id="die1"></div>
+            <div class="die" id="die2"></div>
+            <div class="die" id="die3"></div>
         </div>
 
         <button id="rollButton">Roll Dice! 🎲</button>
@@ -26,6 +22,10 @@
         <div class="patterns-list">
             <h2>Sweater Patterns to Find:</h2>
             <div id="patternsList"></div>
+        </div>
+
+        <div class="stats">
+            <p>Patterns Found: <span id="foundCount">0</span> / <span id="totalCount">0</span></p>
         </div>
 
         <footer>
