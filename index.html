@@ -1,60 +1,43 @@
+<!-- index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Xmas Jumper Game Dice</title>
+    <title>Xmas Jumper Game Dice Roll</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container">
-        <h1>🎄 Xmas Jumper Game Dice 🎄</h1>
+        <h1>Xmas Jumper Game Dice Roll 🎲</h1>
         
-        <div class="dice-section">
-            <div class="dice-container">
-                <div class="die" id="die1">
-                    <div class="die-circle color-circle"></div>
-                    <div class="die-label"></div>
-                </div>
-                <div class="die" id="die2">
-                    <div class="die-circle pattern-circle"></div>
-                    <div class="die-label"></div>
-                </div>
-                <div class="die" id="die3">
-                    <div class="die-circle decoration-circle"></div>
-                    <div class="die-label"></div>
-                </div>
+        <div class="dice-container">
+            <div class="die" id="die1">
+                <div class="die-circle color-circle"></div>
+                <div class="die-label"></div>
+            </div>
+            <div class="die" id="die2">
+                <div class="die-circle pattern-circle"></div>
+                <div class="die-label"></div>
+            </div>
+            <div class="die" id="die3">
+                <div class="die-circle decoration-circle"></div>
+                <div class="die-label"></div>
             </div>
         </div>
 
         <button id="rollButton">Roll Dice! 🎲</button>
 
         <div class="patterns-list">
-            <h2>Jumper Patterns to Find:</h2>
+            <h2>Patterns to Find</h2>
             <div id="patternsList"></div>
         </div>
 
         <div class="stats">
-            <p>Patterns Found: <span id="foundCount">0</span> / <span id="totalCount">0</span></p>
+            <p>Found: <span id="foundCount">0</span> / <span id="totalCount">0</span></p>
         </div>
-
-        <footer>
-            <div class="rules">
-                <p>How to Play:</p>
-                <ol>
-                    <li>Click "Roll Dice" to roll all three dice</li>
-                    <li>First die shows the Color</li>
-                    <li>Second die shows the Pattern</li>
-                    <li>Third die shows the Decoration</li>
-                    <li>Match the combination with your physical Xmas jumper card</li>
-                    <li>Found patterns will be checked off in the list below</li>
-                </ol>
-            </div>
-            <p>Made with ❤️ for Christmas 2024</p>
-        </footer>
     </div>
-
-    <!-- Scripts -->
+    
     <script src="config.js"></script>
     <script src="game.js"></script>
 </body>
