@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Xmas Jumper Game Dice</title>
     <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Optional: Add any immediate styles here */
+    </style>
 </head>
 <body>
     <div class="container">
@@ -13,12 +16,15 @@
         <div class="dice-container">
             <div class="die" id="die1">
                 <span class="die-text"></span>
+                <div class="color-overlay"></div>
             </div>
             <div class="die" id="die2">
                 <span class="die-text"></span>
+                <div class="pattern-overlay"></div>
             </div>
             <div class="die" id="die3">
                 <span class="die-text"></span>
+                <div class="decoration-overlay"></div>
             </div>
         </div>
 
@@ -35,8 +41,22 @@
 
         <footer>
             <p>Made with ❤️ for Christmas 2024</p>
+            <div class="rules">
+                <p>How to Play:</p>
+                <ol>
+                    <li>Click "Roll Dice" to roll all three dice</li>
+                    <li>Each die represents: Color, Pattern, and Decoration</li>
+                    <li>Match the combination with your physical Xmas jumper card</li>
+                    <li>Found patterns will be checked off in the list below</li>
+                </ol>
+            </div>
         </footer>
     </div>
+
+    <!-- Snowflakes container -->
+    <div class="snowflakes" aria-hidden="true"></div>
+
+    <!-- Scripts -->
     <script src="config.js"></script>
     <script src="game.js"></script>
 </body>
