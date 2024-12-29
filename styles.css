@@ -26,7 +26,6 @@ h1 {
     margin-bottom: 30px;
 }
 /* styles.css - Part 2: Dice Container and Basic Die Styling */
-/* styles.css - Part 2: Dice Container and Basic Die Styling */
 .dice-container {
     display: flex;
     justify-content: center;
@@ -34,65 +33,68 @@ h1 {
     margin: 20px 0;
 }
 
+.die-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
 .die {
-    width: 120px;  /* Keep width and height equal */
+    width: 120px;
     height: 120px;
     background: #ffffff;
     border-radius: 10px;
     display: flex;
-    flex-direction: column;
     align-items: center;
-    justify-content: space-between;
-    padding: 15px;
-    box-sizing: border-box;
+    justify-content: center;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     border: 2px solid #ff0000;
-    position: relative; /* Added for absolute positioning of circle */
+    position: relative;
+    overflow: hidden;
+    transform-origin: center;
 }
 
 .die-circle {
-    position: absolute; /* Position circle absolutely */
-    top: 50%;         /* Center vertically */
-    left: 50%;        /* Center horizontally */
-    transform: translate(-50%, -50%); /* Perfect centering */
-    width: 60px;      /* Fixed size for circle */
-    height: 60px;     /* Same as width to ensure perfect circle */
+    width: 60px;
+    height: 60px;
     border-radius: 50%;
     border: 2px solid #ff0000;
     display: flex;
     align-items: center;
     justify-content: center;
     background: #ffffff;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 
 .die-text {
-    position: absolute;
-    bottom: 10px;    /* Position text at bottom */
-    left: 0;         /* Stretch across die */
-    right: 0;
-    text-align: center;
     font-weight: bold;
     color: #0a5f38;
+    font-size: 1.1em;
+    text-align: center;
+    margin-top: 5px;
 }
-
 /* styles.css - Part 3: Color Die Styles */
-.die[data-color="Red"] .color-circle {
+.die[data-color="Red"] .die-circle {
     background-color: #ff0000;
 }
 
-.die[data-color="Green"] .color-circle {
+.die[data-color="Green"] .die-circle {
     background-color: #00aa00;
 }
 
-.die[data-color="White"] .color-circle {
+.die[data-color="White"] .die-circle {
     background-color: #ffffff;
 }
 
-.die[data-color="Blue"] .color-circle {
+.die[data-color="Blue"] .die-circle {
     background-color: #0000ff;
 }
 
-.die[data-color="Gold"] .color-circle {
+.die[data-color="Gold"] .die-circle {
     background-color: #ffd700;
 }
 /* styles.css - Part 4: Pattern Die Styles */
@@ -100,7 +102,7 @@ h1 {
     overflow: hidden;
 }
 
-.die[data-pattern="Striped"] .pattern-circle {
+.die[data-pattern="Striped"] .die-circle {
     background: repeating-linear-gradient(
         45deg,
         rgba(0, 0, 0, 0.2),
@@ -110,7 +112,7 @@ h1 {
     );
 }
 
-.die[data-pattern="Spotty"] .pattern-circle {
+.die[data-pattern="Spotty"] .die-circle {
     background: radial-gradient(
         circle,
         rgba(0, 0, 0, 0.2) 2px,
@@ -118,7 +120,7 @@ h1 {
     ) 0 0/15px 15px;
 }
 
-.die[data-pattern="Zigzag"] .pattern-circle {
+.die[data-pattern="Zigzag"] .die-circle {
     background: linear-gradient(
         135deg,
         rgba(0, 0, 0, 0.2) 25%,
@@ -131,11 +133,11 @@ h1 {
     ) -6px 0/ 12px 12px;
 }
 
-.die[data-pattern="Plain"] .pattern-circle {
+.die[data-pattern="Plain"] .die-circle {
     background: rgba(0, 0, 0, 0.05);
 }
 
-.die[data-pattern="Checkered"] .pattern-circle {
+.die[data-pattern="Checkered"] .die-circle {
     background: 
         linear-gradient(45deg, 
             rgba(0, 0, 0, 0.2) 25%, 
@@ -176,7 +178,45 @@ h1 {
 .die[data-decoration="Bell"] .decoration-circle::after {
     content: '🔔';
 }
-/* styles.css - Part 6: Button and List Styles */
+/* styles.css - Part 6: Animations and Roll Effects */
+@keyframes rollDie {
+    0% {
+        transform: rotateX(0deg) rotateY(0deg);
+    }
+    25% {
+        transform: rotateX(90deg) rotateY(45deg);
+    }
+    50% {
+        transform: rotateX(180deg) rotateY(90deg);
+    }
+    75% {
+        transform: rotateX(270deg) rotateY(135deg);
+    }
+    100% {
+        transform: rotateX(360deg) rotateY(180deg);
+    }
+}
+
+@keyframes blurContent {
+    0%, 100% { 
+        filter: blur(0);
+        opacity: 1;
+    }
+    50% { 
+        filter: blur(4px);
+        opacity: 0.5;
+    }
+}
+
+.die.rolling {
+    animation: rollDie 0.8s ease-in-out;
+    perspective: 1000px;
+}
+
+.die.rolling .die-circle {
+    animation: blurContent 0.8s ease-in-out;
+}
+/* styles.css - Part 7: Button and List Styles */
 #rollButton {
     background-color: #ff0000;
     color: white;
@@ -229,16 +269,10 @@ h1 {
     width: 18px;
     height: 18px;
 }
-/* styles.css - Part 7: Stats, Footer, and Animations */
+
 .stats {
     margin: 20px 0;
     font-size: 1.2em;
-}
-
-footer {
-    margin-top: 40px;
-    padding: 20px;
-    color: rgba(255, 255, 255, 0.8);
 }
 
 .rules {
@@ -258,31 +292,10 @@ footer {
     margin: 5px 0;
 }
 
-/* Snowflake Animation */
-.snowflake {
-    position: fixed;
-    color: white;
-    font-size: 20px;
-    opacity: 0.8;
-    animation: fall linear infinite;
-    z-index: -1;
-    pointer-events: none;
-}
-
-@keyframes fall {
-    to {
-        transform: translateY(100vh);
-    }
-}
-
-/* Dice Rolling Animation */
-.die.rolling .die-circle {
-    animation: rotate 0.5s ease-in-out;
-}
-
-@keyframes rotate {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+footer {
+    margin-top: 40px;
+    padding: 20px;
+    color: rgba(255, 255, 255, 0.8);
 }
 
 /* Scrollbar Styling */
@@ -309,12 +322,11 @@ footer {
     .die {
         width: 90px;
         height: 90px;
-        padding: 10px;
     }
 
     .die-circle {
-        width: 50px;
-        height: 50px;
+        width: 45px;
+        height: 45px;
     }
 
     h1 {
@@ -343,4 +355,9 @@ footer {
         font-size: 0.9em;
     }
 }
+
+
+
+
+
 
