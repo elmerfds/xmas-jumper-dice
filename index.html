@@ -1,0 +1,38 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Christmas Sweater Dice Game</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64,">
+</head>
+<body>
+    <div class="container">
+        <h1>🎄 Christmas Sweater Dice Game 🎄</h1>
+        
+        <div class="preset-controls"></div>
+
+        <div class="dice-container">
+            <div class="die" id="die1">Color</div>
+            <div class="die" id="die2">Pattern</div>
+            <div class="die" id="die3">Decor</div>
+        </div>
+
+        <button id="rollButton">Roll Dice! 🎲</button>
+
+        <div class="patterns-list">
+            <h2>Sweater Patterns to Find:</h2>
+            <div id="patternsList"></div>
+        </div>
+
+        <footer>
+            <p>Made with ❤️ for Christmas 2024</p>
+        </footer>
+    </div>
+    <script src="config.js"></script>
+    <script src="game.js"></script>
+</body>
+</html>
