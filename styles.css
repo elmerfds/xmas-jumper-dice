@@ -1,4 +1,4 @@
-/* styles.css */
+/* styles.css - Part 1 */
 body {
     background-color: #0a5f38;
     color: #ffffff;
@@ -48,8 +48,132 @@ h1 {
     padding: 10px;
     text-align: center;
     transition: transform 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+/* styles.css - Part 2 */
+.die-text {
+    position: relative;
+    z-index: 2;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
 }
 
+/* Color styles */
+.die[data-color="Red"] {
+    background-color: #ff0000;
+    color: white;
+}
+
+.die[data-color="Green"] {
+    background-color: #00aa00;
+    color: white;
+}
+
+.die[data-color="White"] {
+    background-color: #ffffff;
+    color: #0a5f38;
+}
+
+.die[data-color="Blue"] {
+    background-color: #0000ff;
+    color: white;
+}
+
+.die[data-color="Gold"] {
+    background-color: #ffd700;
+    color: #0a5f38;
+}
+
+/* Pattern styles */
+.die[data-pattern="Striped"]::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: repeating-linear-gradient(
+        45deg,
+        rgba(255, 255, 255, 0.2),
+        rgba(255, 255, 255, 0.2) 10px,
+        transparent 10px,
+        transparent 20px
+    );
+}
+/* styles.css - Part 3 */
+.die[data-pattern="Spotty"]::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(
+        circle,
+        rgba(255, 255, 255, 0.2) 2px,
+        transparent 2px
+    ) 0 0/15px 15px;
+}
+
+.die[data-pattern="Zigzag"]::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.2) 25%,
+        transparent 25%
+    ) -10px 0/ 20px 20px,
+    linear-gradient(
+        225deg,
+        rgba(255, 255, 255, 0.2) 25%,
+        transparent 25%
+    ) -10px 0/ 20px 20px;
+}
+
+.die[data-pattern="Checkered"]::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: repeating-conic-gradient(
+        rgba(255, 255, 255, 0.2) 0% 25%,
+        transparent 0% 50%
+    ) 50% / 20px 20px;
+}
+
+/* Decoration styles */
+.die[data-decoration="Snowman"]::after {
+    content: '⛄';
+}
+
+.die[data-decoration="Reindeer"]::after {
+    content: '🦌';
+}
+
+.die[data-decoration="Tree"]::after {
+    content: '🎄';
+}
+
+.die[data-decoration="Star"]::after {
+    content: '⭐';
+}
+
+.die[data-decoration="Bell"]::after {
+    content: '🔔';
+}
+
+.die::after {
+    position: absolute;
+    font-size: 2em;
+    z-index: 1;
+}
+/* styles.css - Part 4 */
 #rollButton {
     background-color: #ff0000;
     color: white;
@@ -106,6 +230,7 @@ h1 {
 .stats {
     margin: 20px 0;
     font-size: 1.2em;
+    color: #ffffff;
 }
 
 .snowflake {
@@ -122,6 +247,16 @@ h1 {
     to {
         transform: translateY(100vh);
     }
+}
+
+@keyframes shake {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(-5deg); }
+    75% { transform: rotate(5deg); }
+}
+
+.die.rolling {
+    animation: shake 0.5s ease-in-out;
 }
 
 footer {
@@ -143,15 +278,40 @@ footer {
 
     .patterns-list {
         max-height: 200px;
+        margin: 20px 10px;
+    }
+
+    .container {
+        padding: 10px;
+    }
+
+    #rollButton {
+        padding: 12px 24px;
+        font-size: 1.1em;
+    }
+
+    .die::after {
+        font-size: 1.5em;
     }
 }
 
-@keyframes shake {
-    0%, 100% { transform: rotate(0deg); }
-    25% { transform: rotate(-5deg); }
-    75% { transform: rotate(5deg); }
+/* Scrollbar styling */
+.patterns-list::-webkit-scrollbar {
+    width: 8px;
 }
 
-.die.rolling {
-    animation: shake 0.5s ease-in-out;
+.patterns-list::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
 }
+
+.patterns-list::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+}
+
+.patterns-list::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.4);
+}
+
+
