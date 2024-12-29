@@ -326,4 +326,40 @@ footer {
     background: rgba(255, 255, 255, 0.4);
 }
 
+.rules {
+    margin-top: 20px;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    text-align: left;
+}
+
+.rules ol {
+    margin: 10px 0;
+    padding-left: 25px;
+}
+
+.rules li {
+    margin: 5px 0;
+}
+
+.color-overlay,
+.pattern-overlay,
+.decoration-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1;
+}
+
+/* Make sure overlays don't interfere with text */
+.die-text {
+    position: relative;
+    z-index: 3;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+}
+
 
