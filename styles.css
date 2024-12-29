@@ -31,7 +31,6 @@ h1 {
     justify-content: center;
     gap: 20px;
     margin: 20px 0;
-    flex-wrap: wrap;
 }
 
 .die {
@@ -49,10 +48,6 @@ h1 {
     padding: 10px;
     text-align: center;
     transition: transform 0.3s ease;
-}
-
-.die:hover {
-    transform: scale(1.05);
 }
 
 #rollButton {
@@ -73,6 +68,12 @@ h1 {
     background-color: #cc0000;
 }
 
+#rollButton:disabled {
+    background-color: #666;
+    cursor: not-allowed;
+    transform: none;
+}
+
 .patterns-list {
     background: rgba(255, 255, 255, 0.1);
     padding: 20px;
@@ -80,17 +81,31 @@ h1 {
     margin: 20px auto;
     max-width: 600px;
     text-align: left;
+    max-height: 300px;
+    overflow-y: auto;
 }
 
 .pattern-item {
     margin: 10px 0;
     padding: 5px;
     transition: color 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
 .pattern-item.found {
-    text-decoration: line-through;
     color: #ff9999;
+}
+
+.pattern-item input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+}
+
+.stats {
+    margin: 20px 0;
+    font-size: 1.2em;
 }
 
 .snowflake {
@@ -100,32 +115,13 @@ h1 {
     opacity: 0.8;
     animation: fall linear infinite;
     z-index: -1;
+    pointer-events: none;
 }
 
 @keyframes fall {
     to {
         transform: translateY(100vh);
     }
-}
-
-.preset-controls {
-    margin: 20px 0;
-}
-
-.preset-controls button {
-    background-color: #ff0000;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    margin: 5px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 1em;
-    transition: background-color 0.3s;
-}
-
-.preset-controls button:hover {
-    background-color: #cc0000;
 }
 
 footer {
@@ -144,4 +140,18 @@ footer {
     h1 {
         font-size: 2em;
     }
+
+    .patterns-list {
+        max-height: 200px;
+    }
+}
+
+@keyframes shake {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(-5deg); }
+    75% { transform: rotate(5deg); }
+}
+
+.die.rolling {
+    animation: shake 0.5s ease-in-out;
 }
