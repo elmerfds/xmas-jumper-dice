@@ -174,8 +174,8 @@ h1 {
     content: '🎄';
 }
 
-.die[data-decoration="Star"] .decoration-circle::after {
-    content: '⭐';
+.die[data-decoration="Snowflake"] .decoration-circle::after {
+    content: '❄️';
 }
 
 .die[data-decoration="Bell"] .decoration-circle::after {
