@@ -2,93 +2,141 @@
 class AudioManager {
     constructor() {
         this.isEnabled = true;
+        this.audioContext = null;
+        this.audioBuffers = {
+            colors: {},
+            patterns: {},
+            decorations: {}
+        };
+        
         this.audioFiles = {
             colors: {
-                'Red': new Audio('./audio/red.wav'),      // Changed from ../audio to ./audio
-                'Green': new Audio('./audio/green.wav'),
-                'Yellow': new Audio('./audio/yellow.wav')
+                'Red': './audio/red.wav',
+                'Green': './audio/green.wav',
+                'Yellow': './audio/yellow.wav'
             },
             patterns: {
-                'Stripy': new Audio('./audio/stripy.wav'),
-                'Spotty': new Audio('./audio/spotty.wav'),
-                'Plain': new Audio('./audio/plain.wav')
+                'Stripy': './audio/stripy.wav',
+                'Spotty': './audio/spotty.wav',
+                'Plain': './audio/plain.wav'
             },
             decorations: {
-                'Snowman': new Audio('./audio/snowman.wav'),
-                'Reindeer': new Audio('./audio/reindeer.wav'),
-                'Tree': new Audio('./audio/tree.wav'),
-                'Snowflake': new Audio('./audio/snowflake.wav')
+                'Snowman': './audio/snowman.wav',
+                'Reindeer': './audio/reindeer.wav',
+                'Tree': './audio/tree.wav',
+                'Snowflake': './audio/snowflake.wav'
             }
         };
         
+        this.initAudioContext();
         this.preloadAudio();
     }
 
-    preloadAudio() {
+    initAudioContext() {
+        // Initialize audio context on first user interaction
+        const initializeAudioContext = () => {
+            if (!this.audioContext) {
+                this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            document.removeEventListener('click', initializeAudioContext);
+        };
+        document.addEventListener('click', initializeAudioContext);
+    }
+
+    async preloadAudio() {
         try {
-            Object.values(this.audioFiles.colors).forEach(audio => {
-                audio.load();
-            });
-            Object.values(this.audioFiles.patterns).forEach(audio => {
-                audio.load();
-            });
-            Object.values(this.audioFiles.decorations).forEach(audio => {
-                audio.load();
-            });
+            // Initialize audio context if not already done
+            if (!this.audioContext) {
+                this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+
+            // Preload color audio files
+            for (const [color, path] of Object.entries(this.audioFiles.colors)) {
+                this.audioBuffers.colors[color] = await this.loadAudioBuffer(path);
+            }
+
+            // Preload pattern audio files
+            for (const [pattern, path] of Object.entries(this.audioFiles.patterns)) {
+                this.audioBuffers.patterns[pattern] = await this.loadAudioBuffer(path);
+            }
+
+            // Preload decoration audio files
+            for (const [decoration, path] of Object.entries(this.audioFiles.decorations)) {
+                this.audioBuffers.decorations[decoration] = await this.loadAudioBuffer(path);
+            }
         } catch (error) {
             console.error('Error preloading audio:', error);
         }
     }
 
+    async loadAudioBuffer(url) {
+        try {
+            const response = await fetch(url);
+            const arrayBuffer = await response.arrayBuffer();
+            return await this.audioContext.decodeAudioData(arrayBuffer);
+        } catch (error) {
+            console.error('Error loading audio buffer:', error);
+            return null;
+        }
+    }
+
+    combineAudioBuffers(buffers) {
+        // Calculate the total length
+        const totalLength = buffers.reduce((acc, buffer) => acc + buffer.length, 0);
+        
+        // Create a combined buffer
+        const combinedBuffer = this.audioContext.createBuffer(
+            1, // mono
+            totalLength,
+            this.audioContext.sampleRate
+        );
+        
+        // Copy each buffer into the combined buffer
+        let offset = 0;
+        buffers.forEach(buffer => {
+            if (buffer && buffer.getChannelData) {
+                combinedBuffer.copyToChannel(buffer.getChannelData(0), 0, offset);
+                offset += buffer.length;
+            }
+        });
+        
+        return combinedBuffer;
+    }
+
     async playSequence(color, pattern, decoration) {
-        if (!this.isEnabled) return;
+        if (!this.isEnabled || !this.audioContext) return;
 
         try {
-            const colorAudio = this.audioFiles.colors[color];
-            const patternAudio = this.audioFiles.patterns[pattern];
-            const decorationAudio = this.audioFiles.decorations[decoration];
-
-            if (!colorAudio || !patternAudio || !decorationAudio) {
-                throw new Error('Missing audio file');
+            // Resume audio context if it's suspended
+            if (this.audioContext.state === 'suspended') {
+                await this.audioContext.resume();
             }
 
-            // Reset all audio to start
-            colorAudio.currentTime = 0;
-            patternAudio.currentTime = 0;
-            decorationAudio.currentTime = 0;
+            // Get the buffers
+            const colorBuffer = this.audioBuffers.colors[color];
+            const patternBuffer = this.audioBuffers.patterns[pattern];
+            const decorationBuffer = this.audioBuffers.decorations[decoration];
 
-            // Adjust these values to control the timing between words
-            const GAP_BETWEEN_WORDS = 10; // milliseconds
+            if (!colorBuffer || !patternBuffer || !decorationBuffer) {
+                throw new Error('Missing audio buffer');
+            }
 
-            // Play color immediately
-            await this.playAudio(colorAudio);
+            // Combine the buffers
+            const combinedBuffer = this.combineAudioBuffers([
+                colorBuffer,
+                patternBuffer,
+                decorationBuffer
+            ]);
             
-            // Wait a short moment then play pattern
-            await new Promise(resolve => setTimeout(resolve, GAP_BETWEEN_WORDS));
-            await this.playAudio(patternAudio);
-            
-            // Wait a short moment then play decoration
-            await new Promise(resolve => setTimeout(resolve, GAP_BETWEEN_WORDS));
-            await this.playAudio(decorationAudio);
+            // Create and play the combined sound
+            const source = this.audioContext.createBufferSource();
+            source.buffer = combinedBuffer;
+            source.connect(this.audioContext.destination);
+            source.start();
 
         } catch (error) {
             console.error('Audio playback failed:', error);
         }
-    }
-
-    playAudio(audioElement) {
-        return new Promise((resolve) => {
-            // Set up ended event listener before playing
-            audioElement.addEventListener('ended', () => {
-                resolve();
-            }, { once: true });
-
-            // Start playing
-            audioElement.play().catch(error => {
-                console.error('Playback failed:', error);
-                resolve(); // Resolve anyway to continue sequence
-            });
-        });
     }
 
     toggle() {
