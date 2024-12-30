@@ -7,6 +7,13 @@ class Game {
         this.foundPatterns = new Set();
         this.isRolling = false;
         this.audioManager = new AudioManager();
+
+        // Add cleanup handler
+        window.addEventListener('beforeunload', () => {
+            if (this.audioManager) {
+                this.audioManager.cleanup();
+            }
+        });
     }
 
     generateAllCombinations() {
@@ -123,9 +130,8 @@ class Game {
         const rotate = () => {
             if (currentRotation < rotations) {
                 currentRotation++;
-                setTimeout(rotate, 800); // Match this with CSS animation duration
+                setTimeout(rotate, 800);
             } else {
-                // Final update after rotations complete
                 dice.forEach(die => {
                     die.classList.remove('rolling');
                     die.querySelector('.die-circle').style.opacity = '1';
@@ -143,7 +149,6 @@ class Game {
                 this.foundPatterns.add(combination);
                 this.updatePatternsList();
 
-                // Play the audio sequence
                 this.audioManager.playSequence(
                     selectedCombination.color,
                     selectedCombination.pattern,
@@ -155,11 +160,10 @@ class Game {
             }
         };
 
-        rotate(); // Start the rotation sequence
+        rotate();
     }
 
     initializeDice() {
-        // Set initial values
         this.updateDieDisplay('die1', diceConfig.dice1.default, 'color');
         this.updateDieDisplay('die2', diceConfig.dice2.default, 'pattern');
         this.updateDieDisplay('die3', diceConfig.dice3.default, 'decoration');
@@ -168,11 +172,9 @@ class Game {
         diceConfig.dice2.currentValue = diceConfig.dice2.default;
         diceConfig.dice3.currentValue = diceConfig.dice3.default;
 
-        // Add click event listener to roll button
         const rollButton = document.getElementById('rollButton');
         rollButton.addEventListener('click', () => this.rollDice());
 
-        // Initialize patterns list and stats
         this.updatePatternsList();
     }
 

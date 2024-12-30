@@ -28,12 +28,35 @@ class AudioManager {
             }
         };
         
+        // Bind methods
+        this.handleVisibilityChange = this.handleVisibilityChange.bind(this);
+        this.handlePageShow = this.handlePageShow.bind(this);
+        
         this.initAudioContext();
         this.preloadAudio();
+        this.setupPageListeners();
+    }
+
+    setupPageListeners() {
+        document.addEventListener('visibilitychange', this.handleVisibilityChange);
+        window.addEventListener('pageshow', this.handlePageShow);
+        window.addEventListener('resume', this.resumeAudioContext.bind(this));
+        window.addEventListener('focus', this.resumeAudioContext.bind(this));
+    }
+
+    async handleVisibilityChange() {
+        if (document.visibilityState === 'visible') {
+            await this.resumeAudioContext();
+        }
+    }
+
+    async handlePageShow(event) {
+        if (event.persisted) {
+            await this.resumeAudioContext();
+        }
     }
 
     initAudioContext() {
-        // Initialize audio context on first user interaction
         const initializeAudioContext = () => {
             if (!this.audioContext) {
                 this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -43,24 +66,42 @@ class AudioManager {
         document.addEventListener('click', initializeAudioContext);
     }
 
+    async resumeAudioContext() {
+        if (this.audioContext) {
+            try {
+                if (this.audioContext.state === 'suspended') {
+                    await this.audioContext.resume();
+                }
+                if (this.audioContext.state === 'closed' || this.audioContext.state === 'failed') {
+                    this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    await this.preloadAudio();
+                }
+            } catch (error) {
+                console.error('Error resuming audio context:', error);
+                try {
+                    this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    await this.preloadAudio();
+                } catch (e) {
+                    console.error('Failed to recreate audio context:', e);
+                }
+            }
+        }
+    }
+
     async preloadAudio() {
         try {
-            // Initialize audio context if not already done
             if (!this.audioContext) {
                 this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
             }
 
-            // Preload color audio files
             for (const [color, path] of Object.entries(this.audioFiles.colors)) {
                 this.audioBuffers.colors[color] = await this.loadAudioBuffer(path);
             }
 
-            // Preload pattern audio files
             for (const [pattern, path] of Object.entries(this.audioFiles.patterns)) {
                 this.audioBuffers.patterns[pattern] = await this.loadAudioBuffer(path);
             }
 
-            // Preload decoration audio files
             for (const [decoration, path] of Object.entries(this.audioFiles.decorations)) {
                 this.audioBuffers.decorations[decoration] = await this.loadAudioBuffer(path);
             }
@@ -85,30 +126,26 @@ class AudioManager {
         let start = 0;
         let end = channelData.length;
 
-        // Find start (trim silence from beginning)
         for (let i = 0; i < channelData.length; i++) {
             if (Math.abs(channelData[i]) > threshold) {
-                start = Math.max(0, i - 100); // Keep a tiny bit of lead-in
+                start = Math.max(0, i - 100);
                 break;
             }
         }
 
-        // Find end (trim silence from end)
         for (let i = channelData.length - 1; i > 0; i--) {
             if (Math.abs(channelData[i]) > threshold) {
-                end = Math.min(channelData.length, i + 100); // Keep a tiny bit of trail
+                end = Math.min(channelData.length, i + 100);
                 break;
             }
         }
 
-        // Create new buffer with trimmed data
         const trimmedBuffer = this.audioContext.createBuffer(
             1,
             end - start,
             audioBuffer.sampleRate
         );
 
-        // Copy the trimmed portion
         const newChannelData = trimmedBuffer.getChannelData(0);
         for (let i = 0; i < end - start; i++) {
             newChannelData[i] = channelData[i + start];
@@ -118,20 +155,15 @@ class AudioManager {
     }
 
     combineAudioBuffers(buffers) {
-        // Trim silence from each buffer
         const trimmedBuffers = buffers.map(buffer => this.trimSilence(buffer));
-        
-        // Calculate total length of trimmed buffers
         const totalLength = trimmedBuffers.reduce((acc, buffer) => acc + buffer.length, 0);
         
-        // Create combined buffer
         const combinedBuffer = this.audioContext.createBuffer(
-            1, // mono
+            1,
             totalLength,
             this.audioContext.sampleRate
         );
         
-        // Copy each trimmed buffer into the combined buffer
         let offset = 0;
         trimmedBuffers.forEach(buffer => {
             if (buffer && buffer.getChannelData) {
@@ -145,11 +177,13 @@ class AudioManager {
     }
 
     async playSequence(color, pattern, decoration) {
-        if (!this.isEnabled || !this.audioContext) return;
+        if (!this.isEnabled) return;
 
         try {
-            if (this.audioContext.state === 'suspended') {
-                await this.audioContext.resume();
+            await this.resumeAudioContext();
+
+            if (!this.audioContext || this.audioContext.state !== 'running') {
+                throw new Error('Audio context not available');
             }
 
             const colorBuffer = this.audioBuffers.colors[color];
@@ -160,14 +194,12 @@ class AudioManager {
                 throw new Error('Missing audio buffer');
             }
 
-            // Combine the trimmed buffers
             const combinedBuffer = this.combineAudioBuffers([
                 colorBuffer,
                 patternBuffer,
                 decorationBuffer
             ]);
             
-            // Create and play the combined sound
             const source = this.audioContext.createBufferSource();
             source.buffer = combinedBuffer;
             source.connect(this.audioContext.destination);
@@ -175,6 +207,12 @@ class AudioManager {
 
         } catch (error) {
             console.error('Audio playback failed:', error);
+            try {
+                await this.initAudioContext();
+                await this.preloadAudio();
+            } catch (e) {
+                console.error('Failed to recover audio system:', e);
+            }
         }
     }
 
@@ -185,6 +223,17 @@ class AudioManager {
 
     isAudioEnabled() {
         return this.isEnabled;
+    }
+
+    cleanup() {
+        document.removeEventListener('visibilitychange', this.handleVisibilityChange);
+        window.removeEventListener('pageshow', this.handlePageShow);
+        window.removeEventListener('resume', this.resumeAudioContext);
+        window.removeEventListener('focus', this.resumeAudioContext);
+        
+        if (this.audioContext) {
+            this.audioContext.close();
+        }
     }
 }
 
