@@ -1,4 +1,5 @@
 // game.js
+import { diceConfig } from './config.js'; // Add this import at the top
 import AudioManager from './audioManager.js';
 
 let foundPatterns = new Set();
