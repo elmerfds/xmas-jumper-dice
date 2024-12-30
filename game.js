@@ -1,7 +1,7 @@
 // game.js
-let isSpeechEnabled = true;
 let foundPatterns = new Set();
 let isRolling = false;
+let isSpeechEnabled = true;
 
 function generateAllCombinations() {
     const combinations = [];
@@ -42,8 +42,9 @@ function updatePatternsList() {
 
 function updateDieDisplay(dieId, value, type) {
     const die = document.getElementById(dieId);
-    const label = die.querySelector('.die-label');
-    label.textContent = value;
+    const dieWrapper = die.closest('.die');
+    const textSpan = die.querySelector('.die-label');
+    textSpan.textContent = value;
     
     // Remove all previous data attributes
     die.removeAttribute('data-color');
@@ -81,6 +82,20 @@ function speakDiceValues(color, pattern, decoration) {
     setTimeout(() => {
         window.speechSynthesis.speak(utterance);
     }, 200);
+}
+
+function setupAudioToggle() {
+    const toggleButton = document.getElementById('audioToggle');
+    
+    toggleButton.addEventListener('click', () => {
+        isSpeechEnabled = !isSpeechEnabled;
+        toggleButton.textContent = isSpeechEnabled ? '🔊' : '🔇';
+        toggleButton.classList.toggle('muted');
+        
+        if (!isSpeechEnabled) {
+            window.speechSynthesis.cancel();
+        }
+    });
 }
 
 function rollDice() {
@@ -177,21 +192,6 @@ function initializeDice() {
 
     // Initialize patterns list and stats
     updatePatternsList();
-}
-
-// Setup audio toggle button functionality
-function setupAudioToggle() {
-    const toggleButton = document.getElementById('audioToggle');
-    
-    toggleButton.addEventListener('click', () => {
-        isSpeechEnabled = !isSpeechEnabled;
-        toggleButton.textContent = isSpeechEnabled ? '🔊' : '🔇';
-        toggleButton.classList.toggle('muted');
-        
-        if (!isSpeechEnabled) {
-            window.speechSynthesis.cancel();
-        }
-    });
 }
 
 // Start the game when DOM is loaded
