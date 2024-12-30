@@ -57,10 +57,20 @@ class AudioManager {
             patternAudio.currentTime = 0;
             decorationAudio.currentTime = 0;
 
-            // Play in sequence
+            // Adjust these values to control the timing between words
+            const GAP_BETWEEN_WORDS = 150; // milliseconds
+
+            // Play color immediately
             await this.playAudio(colorAudio);
+            
+            // Wait a short moment then play pattern
+            await new Promise(resolve => setTimeout(resolve, GAP_BETWEEN_WORDS));
             await this.playAudio(patternAudio);
+            
+            // Wait a short moment then play decoration
+            await new Promise(resolve => setTimeout(resolve, GAP_BETWEEN_WORDS));
             await this.playAudio(decorationAudio);
+
         } catch (error) {
             console.error('Audio playback failed:', error);
         }
@@ -68,7 +78,12 @@ class AudioManager {
 
     playAudio(audioElement) {
         return new Promise((resolve) => {
-            audioElement.addEventListener('ended', () => resolve(), { once: true });
+            // Set up ended event listener before playing
+            audioElement.addEventListener('ended', () => {
+                resolve();
+            }, { once: true });
+
+            // Start playing
             audioElement.play().catch(error => {
                 console.error('Playback failed:', error);
                 resolve(); // Resolve anyway to continue sequence
