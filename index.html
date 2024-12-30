@@ -47,8 +47,10 @@
         </footer>        
     </div>
     
-    <script type="module" src="js/config.js"></script>
-    <script type="module" src="js/audioManager.js"></script>
-    <script type="module" src="js/game.js"></script>
+    <script type="module">
+        import { diceConfig } from './js/config.js';
+        import AudioManager from './js/audioManager.js';
+        import './js/game.js';
+    </script>
 </body>
 </html>
