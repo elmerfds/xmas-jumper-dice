@@ -61,27 +61,50 @@ function speakDiceValues(color, pattern, decoration) {
     const message = `${color} ${pattern} ${decoration}`;
     const utterance = new SpeechSynthesisUtterance(message);
     
-    // Set preferred voice (English)
-    const voices = window.speechSynthesis.getVoices();
-    const englishVoice = voices.find(voice => 
-        voice.lang.includes('en-GB') || voice.lang.includes('en-US')
-    );
-    if (englishVoice) {
-        utterance.voice = englishVoice;
+    // iOS Safari specific handling
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    
+    function speak() {
+        // Cancel any ongoing speech
+        window.speechSynthesis.cancel();
+        
+        // iOS Safari needs a slight delay and different approach
+        if (isIOS) {
+            setTimeout(() => {
+                window.speechSynthesis.speak(utterance);
+            }, 100);
+            return;
+        }
+        
+        // For other browsers
+        const voices = window.speechSynthesis.getVoices();
+        const englishVoice = voices.find(voice => 
+            voice.lang.includes('en-GB') || voice.lang.includes('en-US')
+        );
+        
+        if (englishVoice) {
+            utterance.voice = englishVoice;
+        }
+        
+        utterance.rate = 0.9;
+        utterance.pitch = 1.0;
+        utterance.volume = 1.0;
+        
+        setTimeout(() => {
+            window.speechSynthesis.speak(utterance);
+        }, 200);
     }
     
-    // Configure speech parameters
-    utterance.rate = 0.9; // Slightly slower for clarity
-    utterance.pitch = 1.0;
-    utterance.volume = 1.0;
-    
-    // Cancel any ongoing speech
-    window.speechSynthesis.cancel();
-    
-    // Speak the new values after a small delay to ensure animation is complete
-    setTimeout(() => {
-        window.speechSynthesis.speak(utterance);
-    }, 200);
+    // Handle voice loading differently for different browsers
+    if (window.speechSynthesis.getVoices().length > 0) {
+        speak();
+    } else {
+        // Wait for voices to be loaded
+        window.speechSynthesis.onvoiceschanged = function() {
+            speak();
+            window.speechSynthesis.onvoiceschanged = null;
+        };
+    }
 }
 
 function setupAudioToggle() {
@@ -94,6 +117,10 @@ function setupAudioToggle() {
         
         if (!isSpeechEnabled) {
             window.speechSynthesis.cancel();
+        } else {
+            // Test speech on enable (helps initialize speech on iOS)
+            const testUtterance = new SpeechSynthesisUtterance('');
+            window.speechSynthesis.speak(testUtterance);
         }
     });
 }
