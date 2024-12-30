@@ -8,7 +8,7 @@ const diceConfig = {
     },
     dice2: {
         name: 'Pattern', 
-        faces: ['Striped', 'Spotty', 'Plain'],
+        faces: ['stripy', 'Spotty', 'Plain'],
         default: 'Plain',
         currentValue: null
     },
