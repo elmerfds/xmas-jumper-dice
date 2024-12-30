@@ -36,138 +36,41 @@ class AudioManager {
         // Add last interaction tracking
         this.lastInteractionTime = Date.now();
         
-        // Add tracking for active playback
-        this.currentSource = null;
-        this.isPlaying = false;
-        this.playbackQueue = [];
-        
+        // Initialize audio context immediately
         this.initAudioContext();
         this.preloadAudio();
-        this.setupPageListeners();
     }
 
-    setupPageListeners() {
-        // Page visibility events
-        document.addEventListener('visibilitychange', this.handleVisibilityChange);
-        
-        // Page show/hide events
-        window.addEventListener('pageshow', this.handlePageShow);
-        window.addEventListener('pagehide', this.handlePageHide.bind(this));
-        
-        // Focus events
-        window.addEventListener('focus', this.resumeAudioContext);
-        window.addEventListener('blur', this.handleBlur.bind(this));
-        
-        // iOS specific events
-        window.addEventListener('resume', this.resumeAudioContext);
-        
-        // Touch events for iOS
-        document.addEventListener('touchstart', this.handleInteraction.bind(this));
-        document.addEventListener('touchend', this.handleInteraction.bind(this));
-    }
-
-    handleInteraction() {
-        this.lastInteractionTime = Date.now();
-        this.resumeAudioContext();
+    initAudioContext() {
+        if (!this.audioContext) {
+            this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        }
     }
 
     async handleVisibilityChange() {
         if (document.visibilityState === 'visible') {
-            await this.forceAudioContextResume();
+            await this.resumeAudioContext();
         }
     }
 
     async handlePageShow(event) {
-        if (event.persisted || document.visibilityState === 'visible') {
-            await this.forceAudioContextResume();
-        }
-    }
-
-    handlePageHide() {
-        if (this.audioContext) {
-            this.lastHideTime = Date.now();
-        }
-    }
-
-    handleBlur() {
-        if (this.audioContext) {
-            this.lastBlurTime = Date.now();
-        }
-    }
-
-    initAudioContext() {
-        const initializeAudioContext = () => {
-            if (!this.audioContext) {
-                this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            }
-            document.removeEventListener('click', initializeAudioContext);
-        };
-        document.addEventListener('click', initializeAudioContext);
-    }
-
-    async forceAudioContextResume() {
-        try {
-            // Stop any current playback before resuming context
-            if (this.currentSource) {
-                try {
-                    this.currentSource.stop();
-                } catch (e) {
-                    // Ignore errors from already stopped sources
-                }
-                this.currentSource = null;
-            }
-            this.isPlaying = false;
-
-            const timeSinceLastInteraction = Date.now() - this.lastInteractionTime;
-            if (timeSinceLastInteraction > 1000) {
-                await this.recreateAudioContext();
-            } else {
-                await this.resumeAudioContext();
-            }
-        } catch (error) {
-            console.error('Error resuming audio:', error);
-            await this.recreateAudioContext();
-        }
-    }
-
-    async recreateAudioContext() {
-        try {
-            if (this.audioContext) {
-                await this.audioContext.close();
-            }
-            this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            await this.preloadAudio();
-        } catch (error) {
-            console.error('Error recreating audio context:', error);
+        if (event.persisted) {
+            await this.resumeAudioContext();
         }
     }
 
     async resumeAudioContext() {
-        if (!this.audioContext) {
-            await this.recreateAudioContext();
-            return;
-        }
-
         try {
-            if (this.audioContext.state === 'suspended') {
+            if (this.audioContext && this.audioContext.state === 'suspended') {
                 await this.audioContext.resume();
-            }
-            
-            if (this.audioContext.state !== 'running') {
-                await this.recreateAudioContext();
             }
         } catch (error) {
             console.error('Error resuming audio context:', error);
-            await this.recreateAudioContext();
         }
     }
 
     async preloadAudio() {
         try {
-            if (!this.audioContext) {
-                this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            }
-
             for (const [color, path] of Object.entries(this.audioFiles.colors)) {
                 this.audioBuffers.colors[color] = await this.loadAudioBuffer(path);
             }
@@ -253,21 +156,8 @@ class AudioManager {
     async playSequence(color, pattern, decoration) {
         if (!this.isEnabled) return;
 
-        // Add to queue if currently playing
-        if (this.isPlaying) {
-            console.log('Already playing, skipping...');
-            return;
-        }
-
         try {
-            this.isPlaying = true;
-
-            // Force audio context resume before playing
-            await this.forceAudioContextResume();
-
-            if (!this.audioContext || this.audioContext.state !== 'running') {
-                await this.recreateAudioContext();
-            }
+            await this.resumeAudioContext();
 
             const colorBuffer = this.audioBuffers.colors[color];
             const patternBuffer = this.audioBuffers.patterns[pattern];
@@ -277,15 +167,6 @@ class AudioManager {
                 throw new Error('Missing audio buffer');
             }
 
-            // Stop any current playback
-            if (this.currentSource) {
-                try {
-                    this.currentSource.stop();
-                } catch (e) {
-                    // Ignore errors from already stopped sources
-                }
-            }
-
             const combinedBuffer = this.combineAudioBuffers([
                 colorBuffer,
                 patternBuffer,
@@ -293,23 +174,17 @@ class AudioManager {
             ]);
             
             const source = this.audioContext.createBufferSource();
-            this.currentSource = source;
             source.buffer = combinedBuffer;
             source.connect(this.audioContext.destination);
-
-            // Handle playback completion
-            source.onended = () => {
-                this.isPlaying = false;
-                this.currentSource = null;
-            };
-
             source.start();
 
         } catch (error) {
             console.error('Audio playback failed:', error);
-            this.isPlaying = false;
-            this.currentSource = null;
-            await this.recreateAudioContext();
+            // Reset audio context if needed
+            if (this.audioContext.state !== 'running') {
+                this.initAudioContext();
+                await this.preloadAudio();
+            }
         }
     }
 
@@ -321,34 +196,6 @@ class AudioManager {
     isAudioEnabled() {
         return this.isEnabled;
     }
-
-    cleanup() {
-        // Stop any current playback
-        if (this.currentSource) {
-            try {
-                this.currentSource.stop();
-            } catch (e) {
-                // Ignore errors from already stopped sources
-            }
-            this.currentSource = null;
-        }
-        this.isPlaying = false;
-
-        // Remove all event listeners
-        document.removeEventListener('visibilitychange', this.handleVisibilityChange);
-        window.removeEventListener('pageshow', this.handlePageShow);
-        window.removeEventListener('pagehide', this.handlePageHide);
-        window.removeEventListener('focus', this.resumeAudioContext);
-        window.removeEventListener('blur', this.handleBlur);
-        window.removeEventListener('resume', this.resumeAudioContext);
-        document.removeEventListener('touchstart', this.handleInteraction);
-        document.removeEventListener('touchend', this.handleInteraction);
-        
-        if (this.audioContext) {
-            this.audioContext.close();
-        }
-    }
 }
 
 export default AudioManager;
-
