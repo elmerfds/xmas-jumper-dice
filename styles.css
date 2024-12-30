@@ -126,7 +126,9 @@ h1 {
 
 /* Pattern Die Styles */
 .pattern-circle {
+    background: #ffffff !important;
     overflow: hidden;
+    position: relative;
 }
 
 /* Decoration die specific - keep your existing decoration styles */
@@ -134,15 +136,21 @@ h1 {
     font-size: 2em;
 }
 
-.die[data-pattern="Stripy"] .pattern-circle {
-    background: #ffffff !important;
-    background-image: repeating-linear-gradient(
+.die[data-pattern="Stripy"] .pattern-circle::before {
+    content: '';
+    position: absolute;
+    top: 2px;  /* Offset by border width */
+    left: 2px;
+    right: 2px;
+    bottom: 2px;
+    border-radius: 50%;
+    background: repeating-linear-gradient(
         45deg,
         rgba(0, 0, 0, 0.2),
         rgba(0, 0, 0, 0.2) 6px,
         transparent 6px,
         transparent 12px
-    ) !important;
+    );
 }
 
 .die[data-pattern="Spotty"] .pattern-circle {
