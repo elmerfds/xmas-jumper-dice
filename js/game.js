@@ -85,7 +85,7 @@ class Game {
         });
     }
 
-    rollDice() {
+    async rollDice() {
         if (this.isRolling) return;
         this.isRolling = true;
 
@@ -97,6 +97,9 @@ class Game {
             die.classList.add('rolling');
             die.querySelector('.die-circle').style.opacity = '0.5';
         });
+
+        // Play dice roll sound at the start
+        await this.audioManager.playDiceRoll();
 
         // Get all possible combinations that haven't been found yet
         const allPossibleCombinations = [];
@@ -149,6 +152,7 @@ class Game {
                 this.foundPatterns.add(combination);
                 this.updatePatternsList();
 
+                // Play the pattern sequence after the roll animation
                 this.audioManager.playSequence(
                     selectedCombination.color,
                     selectedCombination.pattern,

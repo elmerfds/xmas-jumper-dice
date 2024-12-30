@@ -4,12 +4,14 @@ class AudioManager {
         this.isEnabled = true;
         this.audioContext = null;
         this.audioBuffers = {
+            diceRoll: null,
             colors: {},
             patterns: {},
             decorations: {}
         };
         
         this.audioFiles = {
+            diceRoll: './audio/diceroll.wav',
             colors: {
                 'Red': './audio/red.wav',
                 'Green': './audio/green.wav',
@@ -71,6 +73,10 @@ class AudioManager {
 
     async preloadAudio() {
         try {
+            // Load dice roll sound
+            this.audioBuffers.diceRoll = await this.loadAudioBuffer(this.audioFiles.diceRoll);
+
+            // Load other audio files
             for (const [color, path] of Object.entries(this.audioFiles.colors)) {
                 this.audioBuffers.colors[color] = await this.loadAudioBuffer(path);
             }
@@ -151,6 +157,36 @@ class AudioManager {
         });
         
         return combinedBuffer;
+    }
+
+    async playDiceRoll() {
+        if (!this.isEnabled) return;
+
+        try {
+            await this.resumeAudioContext();
+
+            const rollBuffer = this.audioBuffers.diceRoll;
+            if (!rollBuffer) {
+                throw new Error('Missing dice roll audio buffer');
+            }
+
+            const source = this.audioContext.createBufferSource();
+            source.buffer = rollBuffer;
+            source.connect(this.audioContext.destination);
+            source.start();
+
+            // Return a promise that resolves when the sound is finished
+            return new Promise((resolve) => {
+                source.onended = resolve;
+            });
+
+        } catch (error) {
+            console.error('Dice roll audio playback failed:', error);
+            if (this.audioContext.state !== 'running') {
+                this.initAudioContext();
+                await this.preloadAudio();
+            }
+        }
     }
 
     async playSequence(color, pattern, decoration) {
