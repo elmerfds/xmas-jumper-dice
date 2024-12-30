@@ -36,7 +36,13 @@ h1 {
 .die {
     width: 120px;
     height: 120px;
-    background: rgba(255, 255, 255, 0.95);
+    /* background: rgba(255, 255, 255, 0.95); */
+    background: #faf3e0; /* Warm cream color */
+    /* OR alternatives:
+    background: #f5e6d3;  Warmer beige
+    background: #fff5e6;  Soft cream
+    background: #ede2d3;  Natural paper tone
+    */
     border-radius: 16px;
     display: flex;
     flex-direction: column;
