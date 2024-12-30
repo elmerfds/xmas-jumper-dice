@@ -102,39 +102,38 @@ h1 {
 }
 
 /* Pattern Die Styles */
-.die[data-pattern="Striped"] .die-circle {
-    background: repeating-linear-gradient(
+.pattern-circle {
+    background: #ffffff !important; /* Same as other circles */
+    overflow: hidden;
+}
+
+.die[data-pattern="Striped"] .pattern-circle {
+    background: #ffffff !important;
+    background-image: repeating-linear-gradient(
         45deg,
         rgba(0, 0, 0, 0.2),
         rgba(0, 0, 0, 0.2) 6px,
         transparent 6px,
         transparent 12px
-    );
+    ) !important;
 }
 
-.die[data-pattern="Spotty"] .die-circle {
-    background: radial-gradient(
+.die[data-pattern="Spotty"] .pattern-circle {
+    background: #ffffff !important;
+    background-image: radial-gradient(
         circle,
         rgba(0, 0, 0, 0.2) 2px,
         transparent 2px
-    ) 0 0/15px 15px;
+    ) !important;
+    background-size: 15px 15px !important;
 }
 
-.die[data-pattern="Zigzag"] .die-circle {
-    background: linear-gradient(
-        135deg,
-        rgba(0, 0, 0, 0.2) 25%,
-        transparent 25%
-    ) -6px 0/ 12px 12px,
-    linear-gradient(
-        225deg,
-        rgba(0, 0, 0, 0.2) 25%,
-        transparent 25%
-    ) -6px 0/ 12px 12px;
-}
-
-.die[data-pattern="Plain"] .die-circle {
-    background: rgba(0, 0, 0, 0.05);
+.die[data-pattern="Plain"] .pattern-circle {
+    background: #ffffff !important;
+    background-image: linear-gradient(
+        rgba(0, 0, 0, 0.05),
+        rgba(0, 0, 0, 0.05)
+    ) !important;
 }
 
 .die[data-pattern="Checkered"] .die-circle {
