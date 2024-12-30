@@ -75,7 +75,7 @@ h1 {
     width: 60px;
     height: 60px;
     border-radius: 50%;
-    border: 2px solid rgba(0, 0, 0, 0.1); /* Consistent subtle border for all circles */
+    border: 2px solid rgba(0, 0, 0, 0.1);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -128,7 +128,6 @@ h1 {
 .pattern-circle {
     background: #ffffff !important;
     overflow: hidden;
-    position: relative;
 }
 
 /* Decoration die specific - keep your existing decoration styles */
@@ -136,13 +135,14 @@ h1 {
     font-size: 2em;
 }
 
-.die[data-pattern="Stripy"] .pattern-circle::before {
+.die[data-pattern="Stripy"] .pattern-circle::after {
     content: '';
     position: absolute;
-    top: 2px;  /* Offset by border width */
-    left: 2px;
-    right: 2px;
-    bottom: 2px;
+    top: 50%;
+    left: 50%;
+    width: calc(100% - 4px);
+    height: calc(100% - 4px);
+    transform: translate(-50%, -50%);
     border-radius: 50%;
     background: repeating-linear-gradient(
         45deg,
