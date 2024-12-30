@@ -36,6 +36,11 @@ class AudioManager {
         // Add last interaction tracking
         this.lastInteractionTime = Date.now();
         
+        // Add tracking for active playback
+        this.currentSource = null;
+        this.isPlaying = false;
+        this.playbackQueue = [];
+        
         this.initAudioContext();
         this.preloadAudio();
         this.setupPageListeners();
@@ -102,6 +107,17 @@ class AudioManager {
 
     async forceAudioContextResume() {
         try {
+            // Stop any current playback before resuming context
+            if (this.currentSource) {
+                try {
+                    this.currentSource.stop();
+                } catch (e) {
+                    // Ignore errors from already stopped sources
+                }
+                this.currentSource = null;
+            }
+            this.isPlaying = false;
+
             const timeSinceLastInteraction = Date.now() - this.lastInteractionTime;
             if (timeSinceLastInteraction > 1000) {
                 await this.recreateAudioContext();
@@ -237,7 +253,15 @@ class AudioManager {
     async playSequence(color, pattern, decoration) {
         if (!this.isEnabled) return;
 
+        // Add to queue if currently playing
+        if (this.isPlaying) {
+            console.log('Already playing, skipping...');
+            return;
+        }
+
         try {
+            this.isPlaying = true;
+
             // Force audio context resume before playing
             await this.forceAudioContextResume();
 
@@ -253,6 +277,15 @@ class AudioManager {
                 throw new Error('Missing audio buffer');
             }
 
+            // Stop any current playback
+            if (this.currentSource) {
+                try {
+                    this.currentSource.stop();
+                } catch (e) {
+                    // Ignore errors from already stopped sources
+                }
+            }
+
             const combinedBuffer = this.combineAudioBuffers([
                 colorBuffer,
                 patternBuffer,
@@ -260,13 +293,22 @@ class AudioManager {
             ]);
             
             const source = this.audioContext.createBufferSource();
+            this.currentSource = source;
             source.buffer = combinedBuffer;
             source.connect(this.audioContext.destination);
+
+            // Handle playback completion
+            source.onended = () => {
+                this.isPlaying = false;
+                this.currentSource = null;
+            };
+
             source.start();
 
         } catch (error) {
             console.error('Audio playback failed:', error);
-            // Try to recover
+            this.isPlaying = false;
+            this.currentSource = null;
             await this.recreateAudioContext();
         }
     }
@@ -281,6 +323,18 @@ class AudioManager {
     }
 
     cleanup() {
+        // Stop any current playback
+        if (this.currentSource) {
+            try {
+                this.currentSource.stop();
+            } catch (e) {
+                // Ignore errors from already stopped sources
+            }
+            this.currentSource = null;
+        }
+        this.isPlaying = false;
+
+        // Remove all event listeners
         document.removeEventListener('visibilitychange', this.handleVisibilityChange);
         window.removeEventListener('pageshow', this.handlePageShow);
         window.removeEventListener('pagehide', this.handlePageHide);
@@ -297,3 +351,4 @@ class AudioManager {
 }
 
 export default AudioManager;
+
