@@ -1,7 +1,9 @@
 // game.js
+import AudioManager from './audioManager.js';
+
 let foundPatterns = new Set();
 let isRolling = false;
-let isSpeechEnabled = true;
+const audioManager = new AudioManager();
 
 function generateAllCombinations() {
     const combinations = [];
@@ -55,73 +57,13 @@ function updateDieDisplay(dieId, value, type) {
     die.setAttribute(`data-${type}`, value);
 }
 
-function speakDiceValues(color, pattern, decoration) {
-    if (!isSpeechEnabled) return;
-    
-    const message = `${color} ${pattern} ${decoration}`;
-    const utterance = new SpeechSynthesisUtterance(message);
-    
-    // iOS Safari specific handling
-    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-    
-    function speak() {
-        // Cancel any ongoing speech
-        window.speechSynthesis.cancel();
-        
-        // iOS Safari needs a slight delay and different approach
-        if (isIOS) {
-            setTimeout(() => {
-                window.speechSynthesis.speak(utterance);
-            }, 100);
-            return;
-        }
-        
-        // For other browsers
-        const voices = window.speechSynthesis.getVoices();
-        const englishVoice = voices.find(voice => 
-            voice.lang.includes('en-GB') || voice.lang.includes('en-US')
-        );
-        
-        if (englishVoice) {
-            utterance.voice = englishVoice;
-        }
-        
-        utterance.rate = 0.9;
-        utterance.pitch = 1.0;
-        utterance.volume = 1.0;
-        
-        setTimeout(() => {
-            window.speechSynthesis.speak(utterance);
-        }, 200);
-    }
-    
-    // Handle voice loading differently for different browsers
-    if (window.speechSynthesis.getVoices().length > 0) {
-        speak();
-    } else {
-        // Wait for voices to be loaded
-        window.speechSynthesis.onvoiceschanged = function() {
-            speak();
-            window.speechSynthesis.onvoiceschanged = null;
-        };
-    }
-}
-
 function setupAudioToggle() {
     const toggleButton = document.getElementById('audioToggle');
     
     toggleButton.addEventListener('click', () => {
-        isSpeechEnabled = !isSpeechEnabled;
-        toggleButton.textContent = isSpeechEnabled ? '🔊' : '🔇';
+        const isEnabled = audioManager.toggle();
+        toggleButton.textContent = isEnabled ? '🔊' : '🔇';
         toggleButton.classList.toggle('muted');
-        
-        if (!isSpeechEnabled) {
-            window.speechSynthesis.cancel();
-        } else {
-            // Test speech on enable (helps initialize speech on iOS)
-            const testUtterance = new SpeechSynthesisUtterance('');
-            window.speechSynthesis.speak(testUtterance);
-        }
     });
 }
 
@@ -190,10 +132,12 @@ function rollDice() {
             foundPatterns.add(combination);
             updatePatternsList();
 
-            // Speak the combination after the dice have stopped rolling
-            speakDiceValues(selectedCombination.color, 
-                          selectedCombination.pattern, 
-                          selectedCombination.decoration);
+            // Play the audio sequence
+            audioManager.playSequence(
+                selectedCombination.color,
+                selectedCombination.pattern,
+                selectedCombination.decoration
+            );
 
             rollButton.disabled = false;
             isRolling = false;
@@ -225,12 +169,4 @@ function initializeDice() {
 document.addEventListener('DOMContentLoaded', () => {
     initializeDice();
     setupAudioToggle();
-    
-    // Initialize voices
-    if (speechSynthesis.onvoiceschanged !== undefined) {
-        speechSynthesis.onvoiceschanged = () => {
-            const voices = window.speechSynthesis.getVoices();
-            console.log('Voices loaded:', voices.length);
-        };
-    }
 });
