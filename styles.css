@@ -370,3 +370,27 @@ h1 {
     }
 }
 
+/* Add to your styles.css */
+.audio-control {
+    margin: 10px 0;
+}
+
+.audio-toggle {
+    background: none;
+    border: 2px solid #ffffff;
+    color: #ffffff;
+    font-size: 1.5em;
+    cursor: pointer;
+    padding: 5px 15px;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.audio-toggle:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.audio-toggle.muted {
+    opacity: 0.5;
+}
+
