@@ -1,4 +1,5 @@
 // game.js
+let isSpeechEnabled = true;
 let foundPatterns = new Set();
 let isRolling = false;
 
@@ -51,6 +52,35 @@ function updateDieDisplay(dieId, value, type) {
     
     // Add new data attribute based on type
     die.setAttribute(`data-${type}`, value);
+}
+
+function speakDiceValues(color, pattern, decoration) {
+    if (!isSpeechEnabled) return;
+    
+    const message = `${color} ${pattern} ${decoration}`;
+    const utterance = new SpeechSynthesisUtterance(message);
+    
+    // Set preferred voice (English)
+    const voices = window.speechSynthesis.getVoices();
+    const englishVoice = voices.find(voice => 
+        voice.lang.includes('en-GB') || voice.lang.includes('en-US')
+    );
+    if (englishVoice) {
+        utterance.voice = englishVoice;
+    }
+    
+    // Configure speech parameters
+    utterance.rate = 0.9; // Slightly slower for clarity
+    utterance.pitch = 1.0;
+    utterance.volume = 1.0;
+    
+    // Cancel any ongoing speech
+    window.speechSynthesis.cancel();
+    
+    // Speak the new values after a small delay to ensure animation is complete
+    setTimeout(() => {
+        window.speechSynthesis.speak(utterance);
+    }, 200);
 }
 
 function rollDice() {
@@ -118,6 +148,11 @@ function rollDice() {
             foundPatterns.add(combination);
             updatePatternsList();
 
+            // Speak the combination after the dice have stopped rolling
+            speakDiceValues(selectedCombination.color, 
+                          selectedCombination.pattern, 
+                          selectedCombination.decoration);
+
             rollButton.disabled = false;
             isRolling = false;
         }
@@ -144,8 +179,31 @@ function initializeDice() {
     updatePatternsList();
 }
 
+// Setup audio toggle button functionality
+function setupAudioToggle() {
+    const toggleButton = document.getElementById('audioToggle');
+    
+    toggleButton.addEventListener('click', () => {
+        isSpeechEnabled = !isSpeechEnabled;
+        toggleButton.textContent = isSpeechEnabled ? '🔊' : '🔇';
+        toggleButton.classList.toggle('muted');
+        
+        if (!isSpeechEnabled) {
+            window.speechSynthesis.cancel();
+        }
+    });
+}
+
 // Start the game when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     initializeDice();
-    setInterval(createSnowflakes, 500);
+    setupAudioToggle();
+    
+    // Initialize voices
+    if (speechSynthesis.onvoiceschanged !== undefined) {
+        speechSynthesis.onvoiceschanged = () => {
+            const voices = window.speechSynthesis.getVoices();
+            console.log('Voices loaded:', voices.length);
+        };
+    }
 });
