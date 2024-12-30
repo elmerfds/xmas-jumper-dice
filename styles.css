@@ -37,8 +37,9 @@ h1 {
     width: 120px;
     height: 120px;
     /* background: rgba(255, 255, 255, 0.95); */
-    background: #faf3e0; /* Warm cream color */
+    background: #ede2d3
     /* OR alternatives:
+    background: #faf3e0;  Warm cream color
     background: #f5e6d3;  Warmer beige
     background: #fff5e6;  Soft cream
     background: #ede2d3;  Natural paper tone
