@@ -107,7 +107,7 @@ h1 {
     overflow: hidden;
 }
 
-.die[data-pattern="Striped"] .pattern-circle {
+.die[data-pattern="Stripy"] .pattern-circle {
     background: #ffffff !important;
     background-image: repeating-linear-gradient(
         45deg,
