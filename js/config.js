@@ -1,5 +1,5 @@
 // config.js
-const diceConfig = {
+export const diceConfig = {
     dice1: {
         name: 'Color',
         faces: ['Red', 'Green', 'Yellow'],
