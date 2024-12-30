@@ -80,20 +80,60 @@ class AudioManager {
         }
     }
 
+    trimSilence(audioBuffer, threshold = 0.01) {
+        const channelData = audioBuffer.getChannelData(0);
+        let start = 0;
+        let end = channelData.length;
+
+        // Find start (trim silence from beginning)
+        for (let i = 0; i < channelData.length; i++) {
+            if (Math.abs(channelData[i]) > threshold) {
+                start = Math.max(0, i - 100); // Keep a tiny bit of lead-in
+                break;
+            }
+        }
+
+        // Find end (trim silence from end)
+        for (let i = channelData.length - 1; i > 0; i--) {
+            if (Math.abs(channelData[i]) > threshold) {
+                end = Math.min(channelData.length, i + 100); // Keep a tiny bit of trail
+                break;
+            }
+        }
+
+        // Create new buffer with trimmed data
+        const trimmedBuffer = this.audioContext.createBuffer(
+            1,
+            end - start,
+            audioBuffer.sampleRate
+        );
+
+        // Copy the trimmed portion
+        const newChannelData = trimmedBuffer.getChannelData(0);
+        for (let i = 0; i < end - start; i++) {
+            newChannelData[i] = channelData[i + start];
+        }
+
+        return trimmedBuffer;
+    }
+
     combineAudioBuffers(buffers) {
-        // No gaps approach - directly concatenate buffers
-        const totalLength = buffers.reduce((acc, buffer) => acc + buffer.length, 0);
+        // Trim silence from each buffer
+        const trimmedBuffers = buffers.map(buffer => this.trimSilence(buffer));
         
-        // Create a combined buffer
+        // Calculate total length of trimmed buffers
+        const totalLength = trimmedBuffers.reduce((acc, buffer) => acc + buffer.length, 0);
+        
+        // Create combined buffer
         const combinedBuffer = this.audioContext.createBuffer(
             1, // mono
             totalLength,
             this.audioContext.sampleRate
         );
         
-        // Copy each buffer into the combined buffer immediately after the previous one
+        // Copy each trimmed buffer into the combined buffer
         let offset = 0;
-        buffers.forEach(buffer => {
+        trimmedBuffers.forEach(buffer => {
             if (buffer && buffer.getChannelData) {
                 const sourceData = buffer.getChannelData(0);
                 combinedBuffer.copyToChannel(sourceData, 0, offset);
@@ -103,24 +143,24 @@ class AudioManager {
         
         return combinedBuffer;
     }
-    
+
     async playSequence(color, pattern, decoration) {
         if (!this.isEnabled || !this.audioContext) return;
-    
+
         try {
             if (this.audioContext.state === 'suspended') {
                 await this.audioContext.resume();
             }
-    
+
             const colorBuffer = this.audioBuffers.colors[color];
             const patternBuffer = this.audioBuffers.patterns[pattern];
             const decorationBuffer = this.audioBuffers.decorations[decoration];
-    
+
             if (!colorBuffer || !patternBuffer || !decorationBuffer) {
                 throw new Error('Missing audio buffer');
             }
-    
-            // Combine the buffers with no gaps
+
+            // Combine the trimmed buffers
             const combinedBuffer = this.combineAudioBuffers([
                 colorBuffer,
                 patternBuffer,
@@ -132,11 +172,11 @@ class AudioManager {
             source.buffer = combinedBuffer;
             source.connect(this.audioContext.destination);
             source.start();
-    
+
         } catch (error) {
             console.error('Audio playback failed:', error);
         }
-    }   
+    }
 
     toggle() {
         this.isEnabled = !this.isEnabled;
