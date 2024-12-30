@@ -58,7 +58,7 @@ class AudioManager {
             decorationAudio.currentTime = 0;
 
             // Adjust these values to control the timing between words
-            const GAP_BETWEEN_WORDS = 20; // milliseconds
+            const GAP_BETWEEN_WORDS = 10; // milliseconds
 
             // Play color immediately
             await this.playAudio(colorAudio);
