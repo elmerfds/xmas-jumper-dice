@@ -81,19 +81,8 @@ class AudioManager {
     }
 
     combineAudioBuffers(buffers) {
-        // Playback speed (1 is normal, 1.2 is 20% faster, etc.)
-        const PLAYBACK_SPEED = 1.2;
-        
-        // Gap between words in seconds (0.01 = 10ms)
-        const GAP_BETWEEN_WORDS = 0.01;
-        
-        // Calculate gap samples
-        const gapSamples = Math.floor(this.audioContext.sampleRate * GAP_BETWEEN_WORDS);
-        
-        // Calculate total length including gaps
-        const totalLength = buffers.reduce((acc, buffer) => {
-            return acc + Math.floor(buffer.length / PLAYBACK_SPEED);
-        }, gapSamples * (buffers.length - 1)); // Add gaps between words
+        // No gaps approach - directly concatenate buffers
+        const totalLength = buffers.reduce((acc, buffer) => acc + buffer.length, 0);
         
         // Create a combined buffer
         const combinedBuffer = this.audioContext.createBuffer(
@@ -102,50 +91,36 @@ class AudioManager {
             this.audioContext.sampleRate
         );
         
-        // Copy each buffer into the combined buffer with speed adjustment
+        // Copy each buffer into the combined buffer immediately after the previous one
         let offset = 0;
-        buffers.forEach((buffer, index) => {
+        buffers.forEach(buffer => {
             if (buffer && buffer.getChannelData) {
                 const sourceData = buffer.getChannelData(0);
-                const targetData = combinedBuffer.getChannelData(0);
-                
-                // Copy samples at adjusted speed
-                for (let i = 0; i < buffer.length; i += PLAYBACK_SPEED) {
-                    if (offset < totalLength) {
-                        targetData[offset] = sourceData[Math.floor(i)];
-                        offset++;
-                    }
-                }
-                
-                // Add gap after each word except the last
-                if (index < buffers.length - 1) {
-                    offset += gapSamples;
-                }
+                combinedBuffer.copyToChannel(sourceData, 0, offset);
+                offset += buffer.length;
             }
         });
         
         return combinedBuffer;
     }
-
+    
     async playSequence(color, pattern, decoration) {
         if (!this.isEnabled || !this.audioContext) return;
-
+    
         try {
-            // Resume audio context if it's suspended
             if (this.audioContext.state === 'suspended') {
                 await this.audioContext.resume();
             }
-
-            // Get the buffers
+    
             const colorBuffer = this.audioBuffers.colors[color];
             const patternBuffer = this.audioBuffers.patterns[pattern];
             const decorationBuffer = this.audioBuffers.decorations[decoration];
-
+    
             if (!colorBuffer || !patternBuffer || !decorationBuffer) {
                 throw new Error('Missing audio buffer');
             }
-
-            // Combine the buffers
+    
+            // Combine the buffers with no gaps
             const combinedBuffer = this.combineAudioBuffers([
                 colorBuffer,
                 patternBuffer,
@@ -157,11 +132,11 @@ class AudioManager {
             source.buffer = combinedBuffer;
             source.connect(this.audioContext.destination);
             source.start();
-
+    
         } catch (error) {
             console.error('Audio playback failed:', error);
         }
-    }
+    }   
 
     toggle() {
         this.isEnabled = !this.isEnabled;
