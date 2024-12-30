@@ -98,9 +98,6 @@ class Game {
             die.querySelector('.die-circle').style.opacity = '0.5';
         });
 
-        // Play dice roll sound at the start
-        await this.audioManager.playDiceRoll();
-
         // Get all possible combinations that haven't been found yet
         const allPossibleCombinations = [];
         diceConfig.dice1.faces.forEach(color => {
@@ -126,45 +123,36 @@ class Game {
         const randomIndex = Math.floor(Math.random() * allPossibleCombinations.length);
         const selectedCombination = allPossibleCombinations[randomIndex];
 
-        // Multiple rotation animation
-        let rotations = 2;
-        let currentRotation = 0;
+        // Play dice roll sound and wait for it to finish
+        await this.audioManager.playDiceRoll();
+
+        // Update dice display after roll
+        dice.forEach(die => {
+            die.classList.remove('rolling');
+            die.querySelector('.die-circle').style.opacity = '1';
+        });
         
-        const rotate = () => {
-            if (currentRotation < rotations) {
-                currentRotation++;
-                setTimeout(rotate, 800);
-            } else {
-                dice.forEach(die => {
-                    die.classList.remove('rolling');
-                    die.querySelector('.die-circle').style.opacity = '1';
-                });
-                
-                this.updateDieDisplay('die1', selectedCombination.color, 'color');
-                this.updateDieDisplay('die2', selectedCombination.pattern, 'pattern');
-                this.updateDieDisplay('die3', selectedCombination.decoration, 'decoration');
+        this.updateDieDisplay('die1', selectedCombination.color, 'color');
+        this.updateDieDisplay('die2', selectedCombination.pattern, 'pattern');
+        this.updateDieDisplay('die3', selectedCombination.decoration, 'decoration');
 
-                diceConfig.dice1.currentValue = selectedCombination.color;
-                diceConfig.dice2.currentValue = selectedCombination.pattern;
-                diceConfig.dice3.currentValue = selectedCombination.decoration;
+        diceConfig.dice1.currentValue = selectedCombination.color;
+        diceConfig.dice2.currentValue = selectedCombination.pattern;
+        diceConfig.dice3.currentValue = selectedCombination.decoration;
 
-                const combination = `${selectedCombination.color} ${selectedCombination.pattern} ${selectedCombination.decoration}`;
-                this.foundPatterns.add(combination);
-                this.updatePatternsList();
+        const combination = `${selectedCombination.color} ${selectedCombination.pattern} ${selectedCombination.decoration}`;
+        this.foundPatterns.add(combination);
+        this.updatePatternsList();
 
-                // Play the pattern sequence after the roll animation
-                this.audioManager.playSequence(
-                    selectedCombination.color,
-                    selectedCombination.pattern,
-                    selectedCombination.decoration
-                );
+        // Play the pattern sequence after the roll
+        this.audioManager.playSequence(
+            selectedCombination.color,
+            selectedCombination.pattern,
+            selectedCombination.decoration
+        );
 
-                rollButton.disabled = false;
-                this.isRolling = false;
-            }
-        };
-
-        rotate();
+        rollButton.disabled = false;
+        this.isRolling = false;
     }
 
     initializeDice() {

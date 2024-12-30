@@ -307,7 +307,7 @@ h1 {
 }
 
 .die.rolling {
-    animation: rollDie 1.5s cubic-bezier(0.45, 0.05, 0.55, 0.95);
+    animation: rollDie 1s cubic-bezier(0.45, 0.05, 0.55, 0.95);
 }
 
 /* Scrollbar Styling */
