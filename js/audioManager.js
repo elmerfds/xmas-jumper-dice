@@ -81,8 +81,19 @@ class AudioManager {
     }
 
     combineAudioBuffers(buffers) {
-        // Calculate the total length
-        const totalLength = buffers.reduce((acc, buffer) => acc + buffer.length, 0);
+        // Playback speed (1 is normal, 1.2 is 20% faster, etc.)
+        const PLAYBACK_SPEED = 1.2;
+        
+        // Gap between words in seconds (0.01 = 10ms)
+        const GAP_BETWEEN_WORDS = 0.01;
+        
+        // Calculate gap samples
+        const gapSamples = Math.floor(this.audioContext.sampleRate * GAP_BETWEEN_WORDS);
+        
+        // Calculate total length including gaps
+        const totalLength = buffers.reduce((acc, buffer) => {
+            return acc + Math.floor(buffer.length / PLAYBACK_SPEED);
+        }, gapSamples * (buffers.length - 1)); // Add gaps between words
         
         // Create a combined buffer
         const combinedBuffer = this.audioContext.createBuffer(
@@ -91,12 +102,25 @@ class AudioManager {
             this.audioContext.sampleRate
         );
         
-        // Copy each buffer into the combined buffer
+        // Copy each buffer into the combined buffer with speed adjustment
         let offset = 0;
-        buffers.forEach(buffer => {
+        buffers.forEach((buffer, index) => {
             if (buffer && buffer.getChannelData) {
-                combinedBuffer.copyToChannel(buffer.getChannelData(0), 0, offset);
-                offset += buffer.length;
+                const sourceData = buffer.getChannelData(0);
+                const targetData = combinedBuffer.getChannelData(0);
+                
+                // Copy samples at adjusted speed
+                for (let i = 0; i < buffer.length; i += PLAYBACK_SPEED) {
+                    if (offset < totalLength) {
+                        targetData[offset] = sourceData[Math.floor(i)];
+                        offset++;
+                    }
+                }
+                
+                // Add gap after each word except the last
+                if (index < buffers.length - 1) {
+                    offset += gapSamples;
+                }
             }
         });
         
