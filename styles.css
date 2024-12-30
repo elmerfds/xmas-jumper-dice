@@ -153,14 +153,21 @@ h1 {
     );
 }
 
-.die[data-pattern="Spotty"] .pattern-circle {
-    background: #ffffff !important;
-    background-image: radial-gradient(
+.die[data-pattern="Spotty"] .pattern-circle::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: calc(100% - 4px);
+    height: calc(100% - 4px);
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    background: radial-gradient(
         circle,
         rgba(0, 0, 0, 0.2) 2px,
         transparent 2px
-    ) !important;
-    background-size: 15px 15px !important;
+    );
+    background-size: 15px 15px;
 }
 
 .die[data-pattern="Plain"] .pattern-circle {
