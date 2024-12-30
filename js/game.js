@@ -7,6 +7,7 @@ class Game {
         this.foundPatterns = new Set();
         this.isRolling = false;
         this.audioManager = new AudioManager();
+        this.lastRolledPattern = null;
 
         // Add cleanup handler
         window.addEventListener('beforeunload', () => {
@@ -77,11 +78,23 @@ class Game {
 
     setupAudioToggle() {
         const toggleButton = document.getElementById('audioToggle');
+        const replayButton = document.getElementById('replayButton');
         
         toggleButton.addEventListener('click', () => {
             const isEnabled = this.audioManager.toggle();
             toggleButton.textContent = isEnabled ? '🔊' : '🔇';
             toggleButton.classList.toggle('muted');
+            replayButton.disabled = !isEnabled;
+        });
+
+        replayButton.addEventListener('click', () => {
+            if (this.lastRolledPattern && !this.isRolling) {
+                this.audioManager.playSequence(
+                    this.lastRolledPattern.color,
+                    this.lastRolledPattern.pattern,
+                    this.lastRolledPattern.decoration
+                );
+            }
         });
     }
 
@@ -90,7 +103,9 @@ class Game {
         this.isRolling = true;
 
         const rollButton = document.getElementById('rollButton');
+        const replayButton = document.getElementById('replayButton');
         rollButton.disabled = true;
+        replayButton.disabled = true;
 
         const dice = document.querySelectorAll('.die');
         dice.forEach(die => {
@@ -115,6 +130,7 @@ class Game {
         if (allPossibleCombinations.length === 0) {
             alert("Congratulations! You've found all possible patterns!");
             rollButton.disabled = true;
+            replayButton.disabled = true;
             this.isRolling = false;
             return;
         }
@@ -122,6 +138,7 @@ class Game {
         // Randomly select from remaining combinations
         const randomIndex = Math.floor(Math.random() * allPossibleCombinations.length);
         const selectedCombination = allPossibleCombinations[randomIndex];
+        this.lastRolledPattern = selectedCombination;
 
         // Play dice roll sound and wait for it to finish
         await this.audioManager.playDiceRoll();
@@ -152,6 +169,7 @@ class Game {
         );
 
         rollButton.disabled = false;
+        replayButton.disabled = false;
         this.isRolling = false;
     }
 
@@ -165,7 +183,9 @@ class Game {
         diceConfig.dice3.currentValue = diceConfig.dice3.default;
 
         const rollButton = document.getElementById('rollButton');
+        const replayButton = document.getElementById('replayButton');
         rollButton.addEventListener('click', () => this.rollDice());
+        replayButton.disabled = true; // Disabled until first roll
 
         this.updatePatternsList();
     }

@@ -370,8 +370,10 @@ h1 {
     }
 }
 
-/* Add to your styles.css */
 .audio-control {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
     margin: 10px 0;
 }
 
@@ -386,8 +388,14 @@ h1 {
     transition: all 0.2s ease;
 }
 
-.audio-toggle:hover {
+.audio-toggle:hover:not(:disabled) {
     background: rgba(255, 255, 255, 0.1);
+}
+
+.audio-toggle:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    border-color: rgba(255, 255, 255, 0.5);
 }
 
 .audio-toggle.muted {
