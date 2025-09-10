@@ -7,4 +7,4 @@ A virtual dice rolling game for the Christmas sweater card game. Players can rol
 2. Match the pattern shown on your physical card
 3. Patterns that have been rolled will be checked off in the list below
 
-Visit the live game at: [YOUR-USERNAME.github.io/christmas-sweater-dice](https://YOUR-USERNAME.github.io/christmas-sweater-dice)
+Visit the live game at: [xmas-jumper-dice](https://elmerfds.github.io/xmas-jumper-dice/)
